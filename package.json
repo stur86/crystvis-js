@@ -4,7 +4,8 @@
   "description": "A Three.js based crystallographic visualisation tool",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-html": "http-server test/test-html & watchify index.js -o test/test-html/testbuild.js"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,10 @@
   },
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
+    "crystcif-parse": "^0.1.2",
     "jquery": "^3.3.1",
+    "lodash": "^4.17.11",
+    "three-orbit-controls": "^82.1.0",
     "three.js": "^0.77.1"
   },
   "devDependencies": {
