@@ -7,7 +7,8 @@ var Renderer = require('./lib/render.js').Renderer;
 
 // Bootstrap the whole thing!
 $(document).ready(function() {
-    var r = new Renderer('.main-app-content');
+    var r = new Renderer('.main-app-content', 640, 480);
+    r.test();
 });
 },{"./lib/render.js":2,"jquery":3}],2:[function(require,module,exports){
 'use strict';
@@ -36,16 +37,23 @@ function Renderer(target, width, height) {
     // Scene
     this._s = new THREE.Scene();
 
-    // var geometry = new THREE.BoxGeometry(1, 1, 1);
-    // var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    // var cube = new THREE.Mesh(geometry, material);
-    // cube.name = 'Cube';
-    // this._s.add(cube);
-
     // Camera
-    this._c = new THREE.PerspectiveCamera(60, this._w / this._h, 0.1, 100);
-    this._c.position.set(0, 0, 2);
+    var ratio = this._w * 1.0 / this._h;
+    var depth = 1000; // For now we use a constant
+    this._c = new THREE.OrthographicCamera(-20, 20, 20 / ratio, -20 / ratio, 0.1, 2*depth);
+    this._c.position.set(0, 0, depth+0.1);
     this._c.lookAt(new THREE.Vector3(0, 0, 0));
+    this._s.add(this._c);
+
+    // Lights
+    this._l = {}
+    this._l._amb = new THREE.AmbientLight(0xffffff, 0.2);
+    this._l._amb.name = 'ambLight';
+    this._l._dir = new THREE.DirectionalLight(0xffffff, 0.5);
+    this._l._dir.position.set(0, 1, -1);
+    this._l._dir.name = 'dirLight';
+    this._s.add(this._l._amb); // Added to scene
+    this._c.add(this._l._dir); // Added to camera (rotates with it)
 
     // Controls
     this._oc = new OrbitControls(this._c, this._r.domElement);
@@ -98,10 +106,30 @@ Renderer.prototype = {
     addClickListener: function(listener, group) {
         var cl = [listener, group];
         this._rcastlist.push(cl);
-        return cl; 
+        return cl;
     },
     removeClickListener: function(cl) {
         _.pull(this._rcastlist, cl);
+    },
+    setAmbLight: function(intensity) {
+        this._l._amb.intensity = intensity;
+    },
+    setDirLight: function(intensity, px, py, pz) {
+        this._l._dir.intensity = intensity;
+        this._l._dir.position.set(px || 0, py || 0, pz || 0);
+    },
+    test: function() {
+        var geometry = new THREE.SphereGeometry(1, 32, 32);
+        var material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+        var cube = new THREE.Mesh(geometry, material);
+        cube.name = 'Cube';
+        this._s.add(cube);
+        var geometry = new THREE.SphereGeometry(0.3, 32, 32);
+        var material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+        var cube = new THREE.Mesh(geometry, material);
+        cube.position.set(2, 0, 0)
+        cube.name = 'Cube';
+        this._s.add(cube);
     }
 }
 
