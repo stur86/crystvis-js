@@ -1,7 +1,8 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
-var $ = require('jquery');
+window.$ = require('jquery');
+window.THREE = require('three');
 
 var Renderer = require('./lib/render.js').Renderer;
 
@@ -14,8 +15,13 @@ $(document).ready(function() {
 
     r._addBond('AB', [0, 0, 1], [0.9, 0, -0.2], 0.2, 0xff0000, 0xeeeeee);
     r._addBond('AB', [0, 0, 1], [-0.9, 0, -0.2], 0.2, 0xff0000, 0xeeeeee);
+
+    var latt = new THREE.Matrix3();
+    latt.set(10, 0, 0, 1, 5, 0, 0, 0, 2).transpose();
+
+    r._addLattice('lattice', latt);
 });
-},{"./lib/render.js":2,"jquery":3}],2:[function(require,module,exports){
+},{"./lib/render.js":2,"jquery":3,"three":6}],2:[function(require,module,exports){
 'use strict';
 
 // NPM imports
@@ -71,7 +77,11 @@ function Renderer(target, width, height) {
     // Groups
     this._g = {};
     this._g._ab = new THREE.Group(); // Atoms and bonds
-    this._s.add(this._g._ab);
+    this._g._latt = new THREE.Group(); // Lattice
+
+    for (var k in this._g) {
+        this._s.add(this._g[k]);
+    }
 
     // Set up the animation
     this._animate();
@@ -124,6 +134,8 @@ Renderer.prototype = {
         atom.position.set(xyz[0], xyz[1], xyz[2]);
 
         this._g._ab.add(atom);
+
+        return atom;
     },
     _addBond: function(name, xyz0, xyz1, r, c0, c1, res) {
         c0 = c0 || 0xffffff;
@@ -145,22 +157,85 @@ Renderer.prototype = {
         var rmat = new THREE.Matrix4();
         rmat.lookAt(p0, p1, new THREE.Vector3(0, 0, 1));
 
+        var bond = new THREE.Group();
         var mat0 = new THREE.MeshPhongMaterial({ color: c0 });
         var mat1 = new THREE.MeshPhongMaterial({ color: c1 });
         var bond0 = new THREE.Mesh(geo, mat0);
-        bond0.name = name + '_0';
         bond0.position.copy(p0.clone().addScaledVector(dp, 0.25));
         bond0.setRotationFromMatrix(rmat);
         var bond1 = new THREE.Mesh(geo, mat1);
-        bond1.name = name + '_1';
         bond1.position.copy(p1.clone().addScaledVector(dp, -0.25));
         bond1.setRotationFromMatrix(rmat);
 
-        this._g._ab.add(bond0);
-        this._g._ab.add(bond1);
+        bond.add(bond0);
+        bond.add(bond1);
+        bond.name = name;
+
+        this._g._ab.add(bond);
+
+        return bond;
     },
-    _remove: function(el) {
-        this._s.remove(el);
+    _addLattice: function(name, lattice_cart, lw) {
+
+        // Linewidth
+        lw = lw || 1;
+
+        // Add a representation of a cartesian lattice given as a matrix
+        var boxGeom = new THREE.Geometry();
+
+        // Create all vertices and faces
+        for (var xs = 0; xs <= 1; ++xs) {
+            for (var ys = 0; ys <= 1; ++ys) {
+                for (var zs = 0; zs <= 1; ++zs) {
+                    var fp = new THREE.Vector3(xs, ys, zs)
+                        .applyMatrix3(lattice_cart);
+                    boxGeom.vertices.push(fp);
+                }
+            }
+        }
+
+        boxGeom.faces = [
+            new THREE.Face3(0, 1, 2),
+            new THREE.Face3(2, 1, 3),
+            new THREE.Face3(4, 5, 6),
+            new THREE.Face3(6, 5, 7),
+            new THREE.Face3(0, 1, 4),
+            new THREE.Face3(4, 1, 5),
+            new THREE.Face3(2, 3, 6),
+            new THREE.Face3(6, 3, 7),
+            new THREE.Face3(0, 2, 4),
+            new THREE.Face3(4, 2, 6),
+            new THREE.Face3(1, 3, 5),
+            new THREE.Face3(5, 3, 7),
+        ];
+
+        boxGeom = new THREE.EdgesGeometry(boxGeom); // Convert to wireframe
+        var boxMat = new THREE.LineBasicMaterial({
+            color: 0xaaaaaa,
+            linewidth: lw
+        });
+        var boxMesh = new THREE.LineSegments(boxGeom, boxMat);
+        boxMesh.name = name;
+
+        // Now add arrows
+        var origin = new THREE.Vector3(0, 0, 0);
+        var elems = lattice_cart.elements;
+        for (var i = 0; i < 3; ++i) {
+            var dir = new THREE.Vector3(elems[3 * i], elems[3 * i + 1], elems[3 * i + 2]);
+            var l = dir.length() / 3.0;
+            dir.normalize();
+            var arr = new THREE.ArrowHelper(dir, origin, l,
+                [0xff0000, 0x00ff00, 0x0000ff][i]);
+            arr.line.material.linewidth = lw*1.2; // Must be slightly thicker
+            boxMesh.add(arr);
+        }
+
+        this._g._latt.add(boxMesh);
+
+        return boxMesh;
+    },
+    _removeAtomBond: function(el) {
+        this._g._ab.remove(el);
     },
     addClickListener: function(listener, group) {
         var cl = [listener, group];

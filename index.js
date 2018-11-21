@@ -1,6 +1,7 @@
 'use strict';
 
-var $ = require('jquery');
+window.$ = require('jquery');
+window.THREE = require('three');
 
 var Renderer = require('./lib/render.js').Renderer;
 
@@ -13,4 +14,9 @@ $(document).ready(function() {
 
     r._addBond('AB', [0, 0, 1], [0.9, 0, -0.2], 0.2, 0xff0000, 0xeeeeee);
     r._addBond('AB', [0, 0, 1], [-0.9, 0, -0.2], 0.2, 0xff0000, 0xeeeeee);
+
+    var latt = new THREE.Matrix3();
+    latt.set(10, 0, 0, 1, 5, 0, 0, 0, 2).transpose();
+
+    r._addLattice('lattice', latt);
 });
