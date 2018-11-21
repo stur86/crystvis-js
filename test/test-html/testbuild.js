@@ -7,8 +7,11 @@ window.THREE = require('three');
 var Renderer = require('./lib/render.js').Renderer;
 
 // Bootstrap the whole thing!
+var r;
+var box
+var arrows;
 $(document).ready(function() {
-    var r = new Renderer('.main-app-content', 640, 480);
+    r = new Renderer('.main-app-content', 640, 480);
     r._addAtom('Atom', [0, 0, 1], 0.5, 0xff0000);
     r._addAtom('Atom', [0.9, 0, -0.2], 0.35, 0xeeeeee);
     r._addAtom('Atom', [-0.9, 0, -0.2], 0.35, 0xeeeeee);
@@ -19,9 +22,17 @@ $(document).ready(function() {
     var latt = new THREE.Matrix3();
     latt.set(10, 0, 0, 1, 5, 0, 0, 0, 2).transpose();
 
-    r._addLattice('lattice', latt);
+    var ba = r._addLattice('lattice', latt);
+    box = ba[0];
+    arrows = ba[1];
+
+    r._addBillBoard([2, 0, 0], 'Hello');
 });
-},{"./lib/render.js":2,"jquery":3,"three":6}],2:[function(require,module,exports){
+
+window.hide_arrows = function() {
+    arrows.visible = !arrows.visible;
+}
+},{"./lib/render.js":2,"jquery":4,"three":7}],2:[function(require,module,exports){
 'use strict';
 
 // NPM imports
@@ -29,6 +40,9 @@ var $ = require('jquery');
 var _ = require('lodash');
 var THREE = require('three');
 var OrbitControls = require('three-orbit-controls')(THREE);
+
+// Internal imports
+var renderTextSprite = require('./rendertext.js').renderTextSprite;
 
 function Renderer(target, width, height) {
 
@@ -78,6 +92,7 @@ function Renderer(target, width, height) {
     this._g = {};
     this._g._ab = new THREE.Group(); // Atoms and bonds
     this._g._latt = new THREE.Group(); // Lattice
+    this._g._bboards = new THREE.Group(); // All billboard-like surfaces
 
     for (var k in this._g) {
         this._s.add(this._g[k]);
@@ -94,6 +109,13 @@ Renderer.prototype = {
     },
     _animate: function() {
         requestAnimationFrame(this._animate.bind(this));
+
+        // Rescale billboards
+        var z = this._c.zoom;
+        _.forEach(this._g._bboards.children, function(bb) {
+            bb.scale.copy(bb._basescale).multiplyScalar(bb._targsize/z);
+        });
+
         this._render();
     },
     _updateSize: function() {
@@ -216,8 +238,10 @@ Renderer.prototype = {
         });
         var boxMesh = new THREE.LineSegments(boxGeom, boxMat);
         boxMesh.name = name;
+        this._g._latt.add(boxMesh);
 
         // Now add arrows
+        var lattArrows = new THREE.Group();
         var origin = new THREE.Vector3(0, 0, 0);
         var elems = lattice_cart.elements;
         for (var i = 0; i < 3; ++i) {
@@ -226,16 +250,29 @@ Renderer.prototype = {
             dir.normalize();
             var arr = new THREE.ArrowHelper(dir, origin, l,
                 [0xff0000, 0x00ff00, 0x0000ff][i]);
-            arr.line.material.linewidth = lw*1.2; // Must be slightly thicker
-            boxMesh.add(arr);
+            arr.line.material.linewidth = lw * 1.2; // Must be slightly thicker
+            lattArrows.add(arr);
         }
 
-        this._g._latt.add(boxMesh);
+        this._g._latt.add(lattArrows);
 
-        return boxMesh;
+        return [boxMesh, lattArrows];
+    },
+    _addBillBoard: function(xyz, text, size, parameters) {
+        var bb = renderTextSprite(text, size, parameters);
+        bb.position.set(xyz[0], xyz[1], xyz[2]);
+        this._g._bboards.add(bb);
+
+        return bb;
     },
     _removeAtomBond: function(el) {
         this._g._ab.remove(el);
+    },
+    _removeLattice: function(el) {
+        this._g._latt.remove(el);
+    },
+    _removeBillBoard: function(el) {
+        this._g._bboards.remove(el);
     },
     addClickListener: function(listener, group) {
         var cl = [listener, group];
@@ -268,7 +305,72 @@ Renderer.prototype = {
 }
 
 exports.Renderer = Renderer;
-},{"jquery":3,"lodash":4,"three":6,"three-orbit-controls":5}],3:[function(require,module,exports){
+},{"./rendertext.js":3,"jquery":4,"lodash":5,"three":7,"three-orbit-controls":6}],3:[function(require,module,exports){
+'use strict';
+
+// NPM imports
+var THREE = require('three');
+
+function make_colorstr(col) {
+    // Takes a colour object, returns an rgba string.
+    var r = col.r || 1;
+    var g = col.g || 1;
+    var b = col.b || 1;
+    var a = col.a || 1;
+
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
+}
+
+exports.renderTextSprite = function(message, size, parameters, cwidth, cheight, maxloops) {
+    // Create a THREE.js sprite with text rendered on top
+    if (parameters === undefined) parameters = {};
+    var fontface = parameters.fontface || "Arial";
+    var fontsize = parameters.fontsize || 18;
+    var fontweight = parameters.fontweight || "Bold";
+    var textColor = parameters.textColor || { r: 255, g: 255, b: 255, a: 1.0 };
+    var textAlign = parameters.textAlign || 'center';
+    var textBaseline = parameters.textBaseline || 'middle';
+
+    size = size || 1;
+    cwidth = cwidth || 256;
+    cheight = cheight || 256;
+    maxloops = maxloops || 10; // Just to make sure it doesn't run infinitely
+
+    var canvas = document.createElement('canvas');
+    canvas.width = cwidth / 2;
+    canvas.height = cheight;
+    var context;
+    var metrics;
+    var room
+    var i = 0;
+    do {
+        canvas.width = canvas.width * 2;
+        context = canvas.getContext('2d');
+        context.font = fontweight + " " + fontsize + "px " + fontface;
+        context.textAlign = textAlign;
+        context.textBaseline = textBaseline;
+        metrics = context.measureText(message);
+        room = canvas.width * (textAlign == 'center' ? 1 : 0.5);
+        i += 1;
+    } while (metrics.width >= room && i < maxloops);
+
+    context.fillStyle = make_colorstr(textColor);
+
+    context.fillText(message, canvas.width / 2.0, canvas.height / 2.0);
+
+    var texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+    var spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    var sprite = new THREE.Sprite(spriteMaterial);
+    sprite.scale.set(size * canvas.width / fontsize, size * canvas.height / fontsize);
+
+    sprite._targsize = size;
+    sprite._basescale = new THREE.Vector2(canvas.width / fontsize,
+        canvas.height / fontsize);
+
+    return sprite;
+}
+},{"three":7}],4:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -10634,7 +10736,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -27745,7 +27847,7 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function( THREE ) {
 	/**
 	 * @author qiao / https://github.com/qiao
@@ -28767,7 +28869,7 @@ module.exports = function( THREE ) {
 	return OrbitControls;
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var self = self || {};// File:src/Three.js
 
 /**
