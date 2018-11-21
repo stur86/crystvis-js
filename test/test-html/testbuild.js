@@ -12,21 +12,33 @@ var box
 var arrows;
 $(document).ready(function() {
     r = new Renderer('.main-app-content', 640, 480);
-    r._addAtom('Atom', [0, 0, 1], 0.5, 0xff0000);
-    r._addAtom('Atom', [0.9, 0, -0.2], 0.35, 0xeeeeee);
-    r._addAtom('Atom', [-0.9, 0, -0.2], 0.35, 0xeeeeee);
 
-    r._addBond('AB', [0, 0, 1], [0.9, 0, -0.2], 0.2, 0xff0000, 0xeeeeee);
-    r._addBond('AB', [0, 0, 1], [-0.9, 0, -0.2], 0.2, 0xff0000, 0xeeeeee);
+    var O = new THREE.Vector3(0, 0, 1);
+    var H1 = new THREE.Vector3(0.9, 0, -0.2);
+    var H2 = new THREE.Vector3(-0.9, 0, -0.2);
+
+    r._addAtom(O, 0.5, 0xff0000);
+    r._addAtom(H1, 0.35, 0xeeeeee);
+    r._addAtom(H2, 0.35, 0xeeeeee);
+
+    r._addBond(O, H1, 0.2, 0xff0000, 0xeeeeee);
+    r._addBond(O, H2, 0.2, 0xff0000, 0xeeeeee);
 
     var latt = new THREE.Matrix3();
     latt.set(10, 0, 0, 1, 5, 0, 0, 0, 2).transpose();
 
-    var ba = r._addLattice('lattice', latt);
+    var ba = r._addLattice(latt);
     box = ba[0];
     arrows = ba[1];
 
-    r._addBillBoard([2, 0, 0], 'Hello');
+    r._addBillBoard(O.clone().add(new THREE.Vector3(0.6, 0.6, 0)), 'Hello');
+
+    r._addEllipsoid(O, new THREE.Vector3(1, -1, 0), 
+        new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3), 
+        0xde3300, 0.6);
+    r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0), 
+        new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2), 
+        0x0033de, 0.6);
 });
 
 window.hide_arrows = function() {
@@ -65,7 +77,9 @@ function Renderer(target, width, height) {
     // Camera
     var ratio = this._w * 1.0 / this._h;
     var depth = 1000; // For now we use a constant
-    this._c = new THREE.OrthographicCamera(-20, 20, 20 / ratio, -20 / ratio, 0.1, 2 * depth);
+    this._c = new THREE.OrthographicCamera(-20, 20,
+        20 / ratio, -20 / ratio,
+        0.1, 2 * depth);
     this._c.position.set(0, 0, depth + 0.1);
     this._c.lookAt(new THREE.Vector3(0, 0, 0));
     this._s.add(this._c);
@@ -93,6 +107,7 @@ function Renderer(target, width, height) {
     this._g._ab = new THREE.Group(); // Atoms and bonds
     this._g._latt = new THREE.Group(); // Lattice
     this._g._bboards = new THREE.Group(); // All billboard-like surfaces
+    this._g._surfs = new THREE.Group(); // All surfaces (ellipsoids etc.)
 
     for (var k in this._g) {
         this._s.add(this._g[k]);
@@ -113,7 +128,7 @@ Renderer.prototype = {
         // Rescale billboards
         var z = this._c.zoom;
         _.forEach(this._g._bboards.children, function(bb) {
-            bb.scale.copy(bb._basescale).multiplyScalar(bb._targsize/z);
+            bb.scale.copy(bb._basescale).multiplyScalar(bb._targsize / z);
         });
 
         this._render();
@@ -145,26 +160,25 @@ Renderer.prototype = {
             this._rcastlist[i][0](intersects);
         }
     },
-    _addAtom: function(name, xyz, r, color, res) {
+    _addAtom: function(xyz, r, color, res) {
         color = color || 0xffffff;
         r = r || 1;
         res = res || 32; // Number of segments
         var geo = new THREE.SphereGeometry(r, res, res);
         var mat = new THREE.MeshPhongMaterial({ color: color });
         var atom = new THREE.Mesh(geo, mat);
-        atom.name = name;
-        atom.position.set(xyz[0], xyz[1], xyz[2]);
+        atom.position.copy(xyz);
 
         this._g._ab.add(atom);
 
         return atom;
     },
-    _addBond: function(name, xyz0, xyz1, r, c0, c1, res) {
+    _addBond: function(xyz0, xyz1, r, c0, c1, res) {
         c0 = c0 || 0xffffff;
         c1 = c1 || 0xffffff;
         res = res || 32;
-        var p0 = new THREE.Vector3(xyz0[0], xyz0[1], xyz0[2]);
-        var p1 = new THREE.Vector3(xyz1[0], xyz1[1], xyz1[2]);
+        var p0 = xyz0.clone();
+        var p1 = xyz1.clone();
 
         var dp = p1.clone();
         dp.sub(p0);
@@ -191,13 +205,12 @@ Renderer.prototype = {
 
         bond.add(bond0);
         bond.add(bond1);
-        bond.name = name;
 
         this._g._ab.add(bond);
 
         return bond;
     },
-    _addLattice: function(name, lattice_cart, lw) {
+    _addLattice: function(lattice_cart, lw) {
 
         // Linewidth
         lw = lw || 1;
@@ -237,7 +250,6 @@ Renderer.prototype = {
             linewidth: lw
         });
         var boxMesh = new THREE.LineSegments(boxGeom, boxMat);
-        boxMesh.name = name;
         this._g._latt.add(boxMesh);
 
         // Now add arrows
@@ -260,10 +272,66 @@ Renderer.prototype = {
     },
     _addBillBoard: function(xyz, text, size, parameters) {
         var bb = renderTextSprite(text, size, parameters);
-        bb.position.set(xyz[0], xyz[1], xyz[2]);
+        bb.position.copy(xyz);
+        bb.renderOrder = 2;
+
         this._g._bboards.add(bb);
 
         return bb;
+    },
+    _addEllipsoid: function(center, ax1, ax2, ax3, color,
+        opacity, res, tol) {
+
+        color = color || 0xffffff;
+        opacity = opacity || 1;
+        res = res || 16;
+        tol = tol || 1e-5;
+        // Check that the axes are truly orthogonal
+        ax1 = ax1.clone();
+        ax2 = ax2.clone();
+        ax3 = ax3.clone();
+
+        var e1 = ax1.length();
+        var e2 = ax2.length();
+        var e3 = ax3.length();
+
+        ax1.normalize();
+        ax2.normalize();
+        ax3.normalize();
+
+        if ((Math.abs(ax1.dot(ax2)) > tol) ||
+            (Math.abs(ax1.dot(ax3)) > tol) ||
+            (Math.abs(ax2.dot(ax3)) > tol)) {
+            throw 'Axes are not orthogonal';
+        }
+
+        var geo = new THREE.SphereGeometry(1, res, res);
+        var mat = new THREE.MeshPhongMaterial({
+            color: color,
+            transparent: opacity < 1,
+            opacity: opacity,
+            depthWrite: false // This is necessary to have proper rendering on top of transparent surfaces.
+        });
+        var ellips = new THREE.Mesh(geo, mat);
+        ellips.position.copy(center);
+        ellips.scale.set(e1, e2, e3);
+        ellips.renderOrder = 0.5;
+
+        // Rotation matrix
+        var dir1 = ax1.toArray();
+        var dir2 = ax2.toArray();
+        var dir3 = ax3.toArray();
+        var rotm = new THREE.Matrix4();
+        rotm.set(
+            dir1[0], dir2[0], dir3[0], 0,
+            dir1[1], dir2[1], dir3[1], 0,
+            dir1[2], dir2[2], dir3[2], 0,
+            0, 0, 0, 1);
+        ellips.setRotationFromMatrix(rotm);
+
+        this._g._surfs.add(ellips);
+
+        return ellips;
     },
     _removeAtomBond: function(el) {
         this._g._ab.remove(el);
@@ -273,6 +341,9 @@ Renderer.prototype = {
     },
     _removeBillBoard: function(el) {
         this._g._bboards.remove(el);
+    },
+    _removeSurf: function(el) {
+        this._g._surfs.remove(el);
     },
     addClickListener: function(listener, group) {
         var cl = [listener, group];
@@ -360,7 +431,10 @@ exports.renderTextSprite = function(message, size, parameters, cwidth, cheight, 
 
     var texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
-    var spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    var spriteMaterial = new THREE.SpriteMaterial({
+        map: texture,
+        depthWrite: false // This is necessary to have proper rendering on top of transparent surfaces.
+    });
     var sprite = new THREE.Sprite(spriteMaterial);
     sprite.scale.set(size * canvas.width / fontsize, size * canvas.height / fontsize);
 
