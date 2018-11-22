@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
+    "chroma-js": "^1.4.0",
     "crystcif-parse": "^0.1.2",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",

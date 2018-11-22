@@ -3,6 +3,7 @@
 window._ = require('lodash');
 window.$ = require('jquery');
 window.THREE = require('three');
+window.chroma = require('chroma-js');
 
 var Renderer = require('./lib/render.js').Renderer;
 
@@ -41,6 +42,25 @@ $(document).ready(function() {
     ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
         new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
         0x0033de, 0.6));
+
+    // Vector field test
+    var points = [];
+    var vectors = [];
+
+    for (var x = 0; x <= 3; x += 0.5) {
+        for (var y = 0; y <= 3; y += 0.5) {
+            for (var z = 0; z <= 2; z += 0.5) {
+                points.push(new THREE.Vector3(x, y, z));
+                vectors.push(new THREE.Vector3(Math.cos(3*x)*0.2, Math.sin(3*y)*0.2, 0));
+            }           
+        }
+    }
+
+    var bez = chroma.bezier(['red', 'blue']);
+    r._addVectorField(points, vectors, function(p, v, i) {
+        return bez(p.length()/6.0).hex();
+    });
+
 });
 
 window.hide_arrows = function() {
