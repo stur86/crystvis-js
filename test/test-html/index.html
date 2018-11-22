@@ -28,6 +28,9 @@
     </head>
     <body>
         <div class="main-app-content"></div>
-        <input type="button" value="Click me" onclick="hide_arrows()"></body>
+        <input type="button" value="Click me" onclick="hide_arrows()">
+        <br>
+
+        <input type="range" min="0.1" max="3.0" step="0.1" onchange="rescale_ellipsoids(event)">
     </body>
 </html>

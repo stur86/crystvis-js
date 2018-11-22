@@ -1,6 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
+window._ = require('lodash');
 window.$ = require('jquery');
 window.THREE = require('three');
 
@@ -10,6 +11,7 @@ var Renderer = require('./lib/render.js').Renderer;
 var r;
 var box
 var arrows;
+var ellipsoids;
 $(document).ready(function() {
     r = new Renderer('.main-app-content', 640, 480);
 
@@ -33,18 +35,27 @@ $(document).ready(function() {
 
     r._addBillBoard(O.clone().add(new THREE.Vector3(0.6, 0.6, 0)), 'Hello');
 
-    r._addEllipsoid(O, new THREE.Vector3(1, -1, 0), 
-        new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3), 
-        0xde3300, 0.6);
-    r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0), 
-        new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2), 
-        0x0033de, 0.6);
+    ellipsoids = [];
+    ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
+        new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
+        0xde3300, 0.6));
+    ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
+        new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
+        0x0033de, 0.6));
 });
 
 window.hide_arrows = function() {
     arrows.visible = !arrows.visible;
 }
-},{"./lib/render.js":2,"jquery":4,"three":7}],2:[function(require,module,exports){
+
+window.rescale_ellipsoids = function(e) {
+    var s = parseFloat(e.target.value);
+
+    _.forEach(ellipsoids, function(el) {
+        el._rescale(s);
+    });
+}
+},{"./lib/render.js":2,"jquery":4,"lodash":5,"three":7}],2:[function(require,module,exports){
 'use strict';
 
 // NPM imports
@@ -96,7 +107,9 @@ function Renderer(target, width, height) {
 
     // Controls
     this._oc = new OrbitControls(this._c, this._r.domElement);
-    this._oc.addEventListener('change', this._render.bind(this));
+    this._oc.addEventListener('change', this._orbit_render.bind(this));
+
+    console.log(this._oc);
 
     // Raycast for clicks
     this._rcastlist = [];
@@ -122,15 +135,17 @@ Renderer.prototype = {
         this._r.clear();
         this._r.render(this._s, this._c);
     },
-    _animate: function() {
-        requestAnimationFrame(this._animate.bind(this));
-
+    _orbit_render: function() {
         // Rescale billboards
         var z = this._c.zoom;
         _.forEach(this._g._bboards.children, function(bb) {
+            console.log("Rescaling");
             bb.scale.copy(bb._basescale).multiplyScalar(bb._targsize / z);
         });
-
+        this._render();
+    },
+    _animate: function() {
+        requestAnimationFrame(this._animate.bind(this));
         this._render();
     },
     _updateSize: function() {
@@ -314,8 +329,14 @@ Renderer.prototype = {
         });
         var ellips = new THREE.Mesh(geo, mat);
         ellips.position.copy(center);
-        ellips.scale.set(e1, e2, e3);
+        // Scale
+        ellips._basescale = new THREE.Vector3(e1, e2, e3);
+        ellips.scale.copy(ellips._basescale);
         ellips.renderOrder = 0.5;
+        
+        ellips._rescale = function(s) {
+            ellips.scale.copy(ellips._basescale.clone().multiplyScalar(s));
+        }
 
         // Rotation matrix
         var dir1 = ax1.toArray();
