@@ -35,13 +35,13 @@ $(document).ready(function() {
 
     r._addBillBoard(O.clone().add(new THREE.Vector3(0.6, 0.6, 0)), 'Hello');
 
-    ellipsoids = [];
-    ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
-        new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
-        0xde3300, 0.6));
-    ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
-        new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
-        0x0033de, 0.6));
+    // ellipsoids = [];
+    // ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
+    //     new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
+    //     0xde3300, 0.6));
+    // ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
+    //     new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
+    //     0x0033de, 0.6));
 
     // Vector field test
     var points = [];
@@ -60,6 +60,23 @@ $(document).ready(function() {
     r._addVectorField(points, vectors, function(p, v, i) {
         return bez(p.length()/6.0).hex();
     });
+
+    // Testing the isosurface
+    
+    var N = 20;
+    var sfield = [];
+    for (var x = 0; x < N; x++) {
+        sfield.push([]);
+        for (var y = 0; y < N; y++) {
+            sfield[x].push([]);
+            for (var z = 0; z < N; z++) {
+                var f = Math.abs(x-N/2.0)*Math.abs(y-N/2.0)*Math.abs(z-N/2.0);
+                sfield[x][y].push(f);
+            }
+        }
+    }
+
+    r._addIsosurface(sfield, 20, latt, 0x00ff00, 0.7);
 
 });
 
