@@ -76,7 +76,7 @@ $(document).ready(function() {
         }
     }
 
-    r._addIsosurface(sfield, 20, latt, 0x00ff00, 0.7);
+    r._addIsosurface(sfield, 20, latt, 0x00ff00, 0.7, 1);
 
 });
 

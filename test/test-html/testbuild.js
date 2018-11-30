@@ -77,7 +77,7 @@ $(document).ready(function() {
         }
     }
 
-    r._addIsosurface(sfield, 20, latt, 0x00ff00, 0.7);
+    r._addIsosurface(sfield, 20, latt, 0x00ff00, 0.7, 1);
 
 });
 
@@ -390,7 +390,8 @@ Renderer.prototype = {
 
         return ellips;
     },
-    _addIsosurface: function(field, threshold, cell, color, opacity) {
+    _addIsosurface: function(field, threshold, cell, color, opacity,
+        method) {
         /*
         Build an isosurface from the data found in field, using threshold
         as a cutoff. Field must be a triple nested array ordered in such a
@@ -401,10 +402,16 @@ Renderer.prototype = {
         is the value at x, y, z. Dimensions must be consistent. Field will
         be considered as spanning the orthorombic cell. If no cell is 
         passed, field's own dimensions will be used.
+
+        Three methods are available:
+        0 = surface nets
+        1 = marching cubes
+        2 = marching tetrahedra
         */
 
         color = color || 0xffffff;
         opacity = opacity || 1;
+        method = method || 0;
 
         // First compute the isosurface vertices and faces
         var dims = [0, 0, 0];
@@ -415,14 +422,24 @@ Renderer.prototype = {
             dims[2] = field[0][0].length;
         } catch (e) {
             // If we're here, something is wrong with field
-            throw 'Invalid field for isosurface';
+            throw 'Invalid field for isosurface rendering';
         }
 
         cell = cell || new THREE.Matrix3(dims[0], 0, 0,
             0, dims[1], 0,
             0, 0, dims[2]);
 
-        var mesh = IsoSurf.surfaceNets(dims, function(x, y, z) {
+
+        var isofunc = IsoSurf[['surfaceNets',
+            'marchingCubes',
+            'marchingTetrahedra'
+        ][method]];
+
+        if (isofunc == null) {
+            throw 'Invalid method for isosurface rendering';
+        }
+
+        var mesh = isofunc(dims, function(x, y, z) {
             return field[x][y][z] - threshold;
         });
 
