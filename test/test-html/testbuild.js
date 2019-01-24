@@ -36,13 +36,13 @@ $(document).ready(function() {
 
     r._addBillBoard(O.clone().add(new THREE.Vector3(0.6, 0.6, 0)), 'Hello');
 
-    // ellipsoids = [];
-    // ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
-    //     new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
-    //     0xde3300, 0.6));
-    // ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
-    //     new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
-    //     0x0033de, 0.6));
+    ellipsoids = [];
+    ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
+        new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
+        0xde3300, 0.6, 2));
+    ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
+        new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
+        0x0033de, 0.6, 2));
 
     // Vector field test
     var points = [];
@@ -77,7 +77,7 @@ $(document).ready(function() {
         }
     }
 
-    r._addIsosurface(sfield, 20, latt, 0x00ff00, 0.7, 1);
+    r._addIsosurface(sfield, 20, latt, 0x00ffff, 0.6, 0);
 
 });
 
@@ -331,12 +331,13 @@ Renderer.prototype = {
         return bb;
     },
     _addEllipsoid: function(center, ax1, ax2, ax3, color,
-        opacity, res, tol) {
+        opacity, wframe, res, tol) {
 
         color = color || 0xffffff;
         opacity = opacity || 1;
         res = res || 16;
         tol = tol || 1e-5;
+        wframe = wframe || 0; // If > 0, used as linewidth
         // Check that the axes are truly orthogonal
         ax1 = ax1.clone();
         ax2 = ax2.clone();
@@ -361,8 +362,10 @@ Renderer.prototype = {
             color: color,
             transparent: opacity < 1,
             opacity: opacity,
-            depthWrite: false // This is necessary to have proper rendering on top of transparent surfaces.
+            depthWrite: false, // This is necessary to have proper rendering on top of transparent surfaces.
         });
+        mat.wireframe = wframe > 0;
+        mat.wireframeLinewidth = wframe;
         var ellips = new THREE.Mesh(geo, mat);
         ellips.position.copy(center);
         // Scale
@@ -390,7 +393,7 @@ Renderer.prototype = {
 
         return ellips;
     },
-    _addIsosurface: function(field, threshold, cell, color, opacity,
+    _addIsosurface: function(field, threshold, cell, color, opacity, wframe,
         method) {
         /*
         Build an isosurface from the data found in field, using threshold
@@ -411,6 +414,7 @@ Renderer.prototype = {
 
         color = color || 0xffffff;
         opacity = opacity || 1;
+        wframe = wframe || 0;
         method = method || 0;
 
         // First compute the isosurface vertices and faces
@@ -466,6 +470,8 @@ Renderer.prototype = {
 
         verts = new Float32Array(verts);
         geo.addAttribute('position', new THREE.BufferAttribute(verts, 3));
+        geo.computeVertexNormals();
+        geo.computeFaceNormals();
         var mat = new THREE.MeshPhongMaterial({
             color: color,
             transparent: opacity < 1,
@@ -473,6 +479,8 @@ Renderer.prototype = {
             depthWrite: false, // This is necessary to have proper rendering on top of transparent surfaces.
             side: THREE.DoubleSide
         });
+        mat.wireframe = wframe > 0;
+        mat.wireframeLinewidth = wframe;
         var isosurf = new THREE.Mesh(geo, mat);
         isosurf.renderOrder = 0.5;
 
