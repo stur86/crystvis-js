@@ -78,6 +78,8 @@ $(document).ready(function() {
 
     r._addIsosurface(sfield, 20, latt, 0x00ffff, 0.6, 0);
 
+    r._addSprite(H1, 'circle.png', 1, 0xffffff);
+
 });
 
 window.hide_arrows = function() {

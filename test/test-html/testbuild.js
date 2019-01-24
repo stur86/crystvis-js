@@ -79,6 +79,8 @@ $(document).ready(function() {
 
     r._addIsosurface(sfield, 20, latt, 0x00ffff, 0.6, 0);
 
+    r._addSprite(H1, 'circle.png', 1, 0xffffff);
+
 });
 
 window.hide_arrows = function() {
@@ -155,6 +157,7 @@ function Renderer(target, width, height) {
     this._g = {};
     this._g._ab = new THREE.Group(); // Atoms and bonds
     this._g._latt = new THREE.Group(); // Lattice
+    this._g._sprites = new THREE.Group(); // All sprites
     this._g._bboards = new THREE.Group(); // All billboard-like surfaces
     this._g._surfs = new THREE.Group(); // All surfaces (ellipsoids etc.)
     this._g._plots = new THREE.Group(); // All other plots
@@ -320,6 +323,17 @@ Renderer.prototype = {
         this._g._latt.add(lattArrows);
 
         return [boxMesh, lattArrows];
+    },
+    _addSprite: function(xyz, map, size, color) {
+        var smap = new THREE.TextureLoader().load( map );
+        var smat = new THREE.SpriteMaterial( { map: smap, color: color } );
+        var sprite = new THREE.Sprite( smat );
+        sprite.position.copy(xyz);
+        sprite.renderOrder = 2;
+        
+        this._g._sprites.add( sprite );
+
+        return sprite;
     },
     _addBillBoard: function(xyz, text, size, parameters) {
         var bb = renderTextSprite(text, size, parameters);
