@@ -791,7 +791,7 @@ exports.renderTextSprite = function(message, size, parameters, cwidth, cheight, 
     root.chroma = chroma;
   }
 
-  chroma.version = '1.4.0';
+  chroma.version = '1.4.1';
 
   _input = {};
 
@@ -2757,7 +2757,7 @@ exports.renderTextSprite = function(message, size, parameters, cwidth, cheight, 
       if (bypassMap == null) {
         bypassMap = false;
       }
-      if (isNaN(val)) {
+      if (isNaN(val) || val === null) {
         return _nacol;
       }
       if (!bypassMap) {
@@ -2995,6 +2995,14 @@ exports.renderTextSprite = function(message, size, parameters, cwidth, cheight, 
         return f;
       } else {
         return _gamma;
+      }
+    };
+    f.nodata = function(d) {
+      if (d != null) {
+        _nacol = chroma(d);
+        return f;
+      } else {
+        return _nacol;
       }
     };
     return f;
