@@ -98,6 +98,11 @@ window.rescale_ellipsoids = function(e) {
 },{"./lib/render.js":2,"chroma-js":4,"jquery":9,"lodash":10,"three":12}],2:[function(require,module,exports){
 'use strict';
 
+/** 
+ * @fileoverview Classes and methods for rendering using THREE.js
+ * @package
+ */
+
 // NPM imports
 var $ = require('jquery');
 var _ = require('lodash');
@@ -108,6 +113,13 @@ var IsoSurf = require('isosurface');
 // Internal imports
 var renderTextSprite = require('./rendertext.js').renderTextSprite;
 
+/** 
+ * An object representing the THREE.js graphical renderer for atomic models 
+ * @class
+ * @param {string}  target      CSS selector for the target HTML element in which to put the renderer
+ * @param {int}     width       Desired width for the renderer
+ * @param {int}     height      Desired height for the renderer
+ */
 function Renderer(target, width, height) {
 
     // Grab the target element
@@ -215,6 +227,16 @@ Renderer.prototype = {
             this._rcastlist[i][0](intersects);
         }
     },
+    /**
+     * Add an atom to the rendered model
+     * 
+     * @param {THREE.Vector3} xyz       Position
+     * @param {float} r                 Radius
+     * @param {THREE.Color} color       Color     
+     * @param {int} res                 Resolution 
+     * 
+     * @returns {THREE.Mesh}           Rendered object
+     */
     _addAtom: function(xyz, r, color, res) {
         color = color || 0xffffff;
         r = r || 1;
@@ -228,6 +250,18 @@ Renderer.prototype = {
 
         return atom;
     },
+    /**
+     * Add a bond to the rendered model
+     * 
+     * @param {THREE.Vector3} xyz0      Start point
+     * @param {THREE.Vector3} xyz1      End point
+     * @param {float} r                 Radius
+     * @param {THREE.Color} c0          First color
+     * @param {THREE.Color} c1          Second color
+     * @param {int} res                 Resolution
+     * 
+     * @returns {THREE.Mesh}           Rendered object
+     */
     _addBond: function(xyz0, xyz1, r, c0, c1, res) {
         c0 = c0 || 0xffffff;
         c1 = c1 || 0xffffff;
@@ -265,6 +299,14 @@ Renderer.prototype = {
 
         return bond;
     },
+    /**
+     * Add lattice box
+     * 
+     * @param {THREE.Matrix3} lattice_cart   Lattice vectors
+     * @param {float} lw                     Line width
+     * 
+     * @returns {THREE.Mesh}           Rendered object
+     */
     _addLattice: function(lattice_cart, lw) {
 
         // Linewidth
@@ -306,17 +348,38 @@ Renderer.prototype = {
 
         return [boxMesh, lattArrows];
     },
+    /**
+     * Add 2D sprite
+     * 
+     * @param {THREE.Vector3} xyz       Position
+     * @param {string} map              Filename of the 2D image to use
+     * @param {float} size              Size (side to side) of the rendered sprite
+     * @param {THREE.Color} color       Color
+     * 
+     * @returns {THREE.Sprite}          Rendered object
+     */
     _addSprite: function(xyz, map, size, color) {
         var smap = new THREE.TextureLoader().load( map );
         var smat = new THREE.SpriteMaterial( { map: smap, color: color } );
         var sprite = new THREE.Sprite( smat );
         sprite.position.copy(xyz);
+        sprite.scale.copy(new THREE.Vector3(size, size, size));
         sprite.renderOrder = 2;
         
         this._g._sprites.add( sprite );
 
         return sprite;
     },
+    /**
+     * Add a text sprite that always faces the camera and always has the same size
+     * 
+     * @param {THREE.Vector3} xyz       Position
+     * @param {string} text             Message
+     * @param {float} size              Scale
+     * @param {Object} parameters       Other parameters (font, color etc. - see rendertext.js for details)
+     * 
+     * @returns {THREE.Sprite}          Rendered object
+     */
     _addBillBoard: function(xyz, text, size, parameters) {
         var bb = renderTextSprite(text, size, parameters);
         bb.position.copy(xyz);
@@ -326,6 +389,21 @@ Renderer.prototype = {
 
         return bb;
     },
+    /**
+     * Add an ellipsoid to the model
+     * 
+     * @param {THREE.Vector3} center        Ellipsoid center
+     * @param {THREE.Vector3} ax1           Axis 1
+     * @param {THREE.Vector3} ax2           Axis 2
+     * @param {THREE.Vector3} ax3           Axis 3
+     * @param {THREE.Color} color           Color
+     * @param {float} opacity               Opacity
+     * @param {boolean} wframe              If the ellipsoid should be rendered as wireframe or not
+     * @param {int} res                     Resolution of the model
+     * @param {float} tol                   Tolerance when calculating whether the axes are orthogonal
+     * 
+     * @returns {THREE.Mesh}           Rendered object
+     */
     _addEllipsoid: function(center, ax1, ax2, ax3, color,
         opacity, wframe, res, tol) {
 
@@ -389,24 +467,34 @@ Renderer.prototype = {
 
         return ellips;
     },
+    /**
+     * Build an isosurface from the data found in field, using threshold
+     * as a cutoff. Field must be a triple nested array ordered in such a
+     * way that:
+     *  
+     * field[x][y][z]
+     *
+     * is the value at x, y, z. Dimensions must be consistent. Field will
+     * be considered as spanning the orthorombic cell. If no cell is 
+     * passed, field's own dimensions will be used.
+     *
+     * Three methods are available:
+     * 0 = surface nets
+     * 1 = marching cubes
+     * 2 = marching tetrahedra
+     * 
+     * @param {Array} field             Volumetric data
+     * @param {float} threshold         Isosurface threshold 
+     * @param {THREE.Matrix3} cell      Unit cell on which the data is defined
+     * @param {THREE.Color} color       Color
+     * @param {float} opacity           Opacity
+     * @param {boolean} wframe          Whether to render the isosurface as wireframe or not
+     * @param {int} method              Method used to compute the isosurface
+     * 
+     * @returns {THREE.Mesh}           Rendered object
+     */
     _addIsosurface: function(field, threshold, cell, color, opacity, wframe,
         method) {
-        /*
-        Build an isosurface from the data found in field, using threshold
-        as a cutoff. Field must be a triple nested array ordered in such a
-        way that:
-
-        field[x][y][z]
-
-        is the value at x, y, z. Dimensions must be consistent. Field will
-        be considered as spanning the orthorombic cell. If no cell is 
-        passed, field's own dimensions will be used.
-
-        Three methods are available:
-        0 = surface nets
-        1 = marching cubes
-        2 = marching tetrahedra
-        */
 
         color = color || 0xffffff;
         opacity = opacity || 1;
@@ -484,6 +572,17 @@ Renderer.prototype = {
 
         return isosurf;
     },
+    /**
+     * Add a vector field representation to the model
+     * 
+     * @param {Array} points            List of origins for the vectors
+     * @param {Array} vectors           Vectors to plot
+     * @param {*} colors                Colors for each vector. Can be a single color, an array of colors, or a function that takes 
+     *                                  origin, vector, and index, and returns a color.
+     * @param {float} scale             Scaling factor
+     * 
+     * @returns {THREE.Group}           Rendered object
+     */
     _addVectorField: function(points, vectors, colors, scale) {
 
         var N = points.length;
@@ -524,6 +623,8 @@ Renderer.prototype = {
 
         return vfield;
     },
+    /* All the following functions simply remove objects of each type
+    */
     _removeAtomBond: function(el) {
         this._g._ab.remove(el);
     },
@@ -536,20 +637,47 @@ Renderer.prototype = {
     _removeSurf: function(el) {
         this._g._surfs.remove(el);
     },
+    /**
+     * Add a listener for click events on a given group
+     * 
+     * @param {Function} listener       Listener function
+     * @param {THREE.Group} group       Group on which to detect clicks
+     * 
+     * @returns {Array}                 Reference to the created listener
+     */
     addClickListener: function(listener, group) {
         var cl = [listener, group];
         this._rcastlist.push(cl);
         return cl;
     },
+    /**
+     * Remove a listener
+     * @param {Array} cl                Reference to the listener to remove (as returned by addClickListener) 
+     */
     removeClickListener: function(cl) {
         _.pull(this._rcastlist, cl);
     },
+    /**
+     * Set properties of ambient light
+     * 
+     * @param {float} intensity     Intensity
+     */
     setAmbLight: function(intensity) {
         this._l._amb.intensity = intensity;
     },
+    /**
+     * Set properties of directional light
+     * 
+     * @param {float} intensity     Intensity
+     * @param {float} px            Direction, x
+     * @param {float} py            Direction, y
+     * @param {float} pz            Direction, z
+     */    
     setDirLight: function(intensity, px, py, pz) {
         this._l._dir.intensity = intensity;
-        this._l._dir.position.set(px || 0, py || 0, pz || 0);
+        this._l._dir.position.set(px || this._l.dir.position.x, 
+                                  py || this._l.dir.position.y, 
+                                  pz || this._l.dir.position.z);
     },
     test: function() {
         var geometry = new THREE.SphereGeometry(1, 32, 32);
