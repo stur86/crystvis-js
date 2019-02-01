@@ -18,6 +18,7 @@ $(document).ready(function() {
     var O = new THREE.Vector3(0, 0, 1);
     var H1 = new THREE.Vector3(0.9, 0, -0.2);
     var H2 = new THREE.Vector3(-0.9, 0, -0.2);
+    
 
     r._addAtom(O, 0.5, 0xff0000);
     r._addAtom(H1, 0.35, 0xeeeeee);
@@ -33,7 +34,7 @@ $(document).ready(function() {
     box = ba[0];
     arrows = ba[1];
 
-    r._addBillBoard(O.clone().add(new THREE.Vector3(0.6, 0.6, 0)), 'Hello');
+    r._addBillBoard(O.clone().add(new THREE.Vector3(0.6, 0.6, 0)), 'Hello world');
 
     ellipsoids = [];
     ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
