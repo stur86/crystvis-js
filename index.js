@@ -6,6 +6,7 @@ window.THREE = require('three');
 window.chroma = require('chroma-js');
 
 var Renderer = require('./lib/render.js').Renderer;
+var Model = require('./lib/model.js').Model;
 
 // Bootstrap the whole thing!
 var r;
@@ -13,6 +14,15 @@ var box
 var arrows;
 var ellipsoids;
 $(document).ready(function() {
+
+    var Atoms = require('crystcif-parse').Atoms;
+
+    var a = new Atoms(['C'], [[0, 0, 1]], [[2, 0, 0], [0, 2, 0], [0, 1, 2]]);
+
+    var m = new Model(a);
+
+    console.log(m);
+    /*
     r = new Renderer('.main-app-content', 640, 480);
 
     var O = new THREE.Vector3(0, 0, 1);
@@ -80,6 +90,7 @@ $(document).ready(function() {
     r._addIsosurface(sfield, 20, latt, 0x00ffff, 0.6, 0);
 
     r._addSprite(H1, 'circle.png', 1, 0xffffff);
+    */
 
 });
 
