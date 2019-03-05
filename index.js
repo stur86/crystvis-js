@@ -22,7 +22,6 @@ $(document).ready(function() {
     var m = new Model(a);
 
     console.log(m);
-    /*
     r = new Renderer('.main-app-content', 640, 480);
 
     var O = new THREE.Vector3(0, 0, 1);
@@ -49,10 +48,10 @@ $(document).ready(function() {
     ellipsoids = [];
     ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
         new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
-        0xde3300, 0.6, 2));
+        0xde3300, 0.3, 0));
     ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
         new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
-        0x0033de, 0.6, 2));
+        0x0033de, 0.3, 0));
 
     // Vector field test
     var points = [];
@@ -90,7 +89,6 @@ $(document).ready(function() {
     r._addIsosurface(sfield, 20, latt, 0x00ffff, 0.6, 0);
 
     r._addSprite(H1, 'circle.png', 1, 0xffffff);
-    */
 
 });
 

@@ -33,6 +33,6 @@
     "three.js": "^0.77.1"
   },
   "devDependencies": {
-    "watchify": "^3.11.0"
+    "watchify": "^3.11.1"
   }
 }
