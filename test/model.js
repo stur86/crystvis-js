@@ -17,7 +17,6 @@ var chamodel = new Model(cha);
 
 describe('#atomimage', function() {
     it('should correctly compute the periodic copy position', function() {
-
         var aim = new AtomImage(chamodel, 0, [1,0,0]);
         [25.339775, 1.16060394, 1.8119109].forEach(function(v, i) {
             expect(aim.xyz[i]).to.be.closeTo(v, 1e-5);
