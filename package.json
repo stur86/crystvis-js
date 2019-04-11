@@ -4,7 +4,7 @@
   "description": "A Three.js based crystallographic visualisation tool",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --reporter spec",
     "test-html": "http-server test/test-html & watchify index.js -o test/test-html/testbuild.js"
   },
   "repository": {
@@ -33,6 +33,8 @@
     "three.js": "^0.77.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.2",
     "watchify": "^3.11.1"
   }
 }
