@@ -11,7 +11,7 @@ const Model = require('../lib/model.js').Model;
 const AtomImage = require('../lib/model.js').AtomImage;
 
 // Load a test file
-var cif = fs.readFileSync(path.join(__dirname, 'CHA.cif'), "utf8");
+var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
 var cha = Atoms.readCif(cif)['CHA'];
 var chamodel = new Model(cha);
 
