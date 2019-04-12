@@ -28,3 +28,10 @@ describe('#atomimage', function() {
         });
     });
 });
+
+describe('#model', function() {
+    it('should correctly compute a supercell grid', function() {
+        chamodel.supercell = [3,3,3];
+        expect(chamodel.supercell_grid.length).to.be.equal(27);
+    });
+})
