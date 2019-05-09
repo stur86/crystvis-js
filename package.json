@@ -27,14 +27,14 @@
     "chroma-js": "^1.4.1",
     "crystcif-parse": "^0.1.4",
     "isosurface": "^1.0.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.1",
     "lodash": "^4.17.11",
     "three-orbit-controls": "^82.1.0",
     "three.js": "^0.77.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.1.2",
+    "mocha": "^6.1.4",
     "watchify": "^3.11.1"
   }
 }
