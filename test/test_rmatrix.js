@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 var nm = require('numeric');
 
-var cif = fs.readFileSync(path.join(__dirname, 'CHA.cif'), "utf8");
+var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
 var a = Atoms.readCif(cif)['CHA'];
 
 var c = new nm.T(a.get_cell());
