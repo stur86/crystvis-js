@@ -37,7 +37,7 @@ $(document).ready(function() {
     r._addBond(O, H2, 0.2, 0xff0000, 0xeeeeee);
 
     var latt = new THREE.Matrix3();
-    latt.set(10, 0, 0, 1, 5, 0, 0, 0, 2).transpose();
+    latt.set(10, 0, 0, 1, 8, 0, 0, 0, 9).transpose();
 
     var ba = r._addLattice(latt);
     box = ba[0];
@@ -48,10 +48,10 @@ $(document).ready(function() {
     ellipsoids = [];
     ellipsoids.push(r._addEllipsoid(O, new THREE.Vector3(1, -1, 0),
         new THREE.Vector3(2, 2, 0), new THREE.Vector3(0, 0, 3),
-        0xde3300, 0.8, Renderer.WFRAME));
+        0xde3300, 0.5, Renderer.DITHERNET));
     ellipsoids.push(r._addEllipsoid(H1, new THREE.Vector3(1, 0, 0),
         new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(0, 0, 1.2),
-        0x0033de, 0.3, Renderer.WFRAME));
+        0x0033de, 0.5, Renderer.DITHERNET));
 
     // Vector field test
     var points = [];
@@ -67,9 +67,9 @@ $(document).ready(function() {
     }
 
     var bez = chroma.bezier(['red', 'blue']);
-    r._addVectorField(points, vectors, function(p, v, i) {
-        return bez(p.length()/6.0).hex();
-    });
+    // r._addVectorField(points, vectors, function(p, v, i) {
+    //     return bez(p.length()/6.0).hex();
+    // });
 
     // Testing the isosurface
     
@@ -81,12 +81,13 @@ $(document).ready(function() {
             sfield[x].push([]);
             for (var z = 0; z < N; z++) {
                 var f = Math.abs(x-N/2.0)*Math.abs(y-N/2.0)*Math.abs(z-N/2.0);
+                f = Math.cos(x)+Math.cos(y)+Math.cos(z);
                 sfield[x][y].push(f);
             }
         }
     }
 
-    r._addIsosurface(sfield, 20, latt, 0x00ffff, 0.3, Renderer.WFRAME, Renderer.ISO_SURFACE_NETS);
+    r._addIsosurface(sfield, 0.5, latt, 0x00ffff, 0.3, Renderer.PHONG, Renderer.ISO_SURFACE_NETS);
 
     r._addSprite(H1, 'circle.png', 1, 0xffffff);
 

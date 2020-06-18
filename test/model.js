@@ -52,6 +52,12 @@ describe('#model', function () {
         expect(orgmodel.minimumSupercell(20)).to.deep.equal([7, 7, 5]);
     });
 
+    it('should correctly return its various properties', function() {
+        expect(pyrmodel.length).to.equal(11);
+        expect(chamodel.periodic).to.be.true;
+        expect(pyrmodel.periodic).to.be.false;
+    });
+
     it('should correctly query for atoms in various ways', function () {
         // Here we only test the raw query functions, not meant for 
         // public use
@@ -59,5 +65,11 @@ describe('#model', function () {
         var found = pyrmodel._queryElements(['C']);
         expect(_.map(found, function (v) { return v[0]; })).to.deep.equal([0, 1, 2, 4, 5]);
 
+        found = chamodel._queryCell([5,5,5]); // Beyond the supercell size
+        expect(found).to.deep.equal([]);
+
+        found = chamodel._queryCell([1,1,1]);
+        expect(found.length).to.equal(chamodel.length);
+        expect(found[0][1]).to.deep.equal([1,1,1]);
     });
 });
