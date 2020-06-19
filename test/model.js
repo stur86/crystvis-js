@@ -26,22 +26,27 @@ var loader = new Loader();
 var pyr = loader.loadXYZ(xyz);
 var pyrmodel = new Model(pyr);
 
-describe('#atomimage', function () {
-    it('should correctly compute the periodic copy position', function () {
+xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
+var loader = new Loader();
+var si = loader.loadXYZ(xyz);
+var simodel = new Model(si);
+
+describe('#atomimage', function() {
+    it('should correctly compute the periodic copy position', function() {
         var aim = new AtomImage(chamodel, 0, [1, 0, 0]);
-        [25.339775, 1.16060394, 1.8119109].forEach(function (v, i) {
+        [25.339775, 1.16060394, 1.8119109].forEach(function(v, i) {
             expect(aim.xyz[i]).to.be.closeTo(v, 1e-5);
         });
 
         aim = new AtomImage(chamodel, 0, [-1, 1, 1]);
-        [-8.847725, 13.00350134, 16.5789109].forEach(function (v, i) {
+        [-8.847725, 13.00350134, 16.5789109].forEach(function(v, i) {
             expect(aim.xyz[i]).to.be.closeTo(v, 1e-5);
         });
     });
 });
 
-describe('#model', function () {
-    it('should correctly compute a supercell grid', function () {
+describe('#model', function() {
+    it('should correctly compute a supercell grid', function() {
         chamodel.supercell = [3, 3, 3];
         expect(chamodel.supercell_grid.length).to.be.equal(27);
     });
@@ -56,20 +61,46 @@ describe('#model', function () {
         expect(pyrmodel.length).to.equal(11);
         expect(chamodel.periodic).to.be.true;
         expect(pyrmodel.periodic).to.be.false;
+        expect(simodel.periodic).to.be.true;
     });
 
-    it('should correctly query for atoms in various ways', function () {
+    it('should correctly query for atoms in various ways', function() {
         // Here we only test the raw query functions, not meant for 
         // public use
 
         var found = pyrmodel._queryElements(['C']);
-        expect(_.map(found, function (v) { return v[0]; })).to.deep.equal([0, 1, 2, 4, 5]);
+        expect(_.map(found, function(v) {
+            return v[0];
+        })).to.deep.equal([0, 1, 2, 4, 5]);
 
-        found = chamodel._queryCell([5,5,5]); // Beyond the supercell size
+        found = chamodel._queryCell([5, 5, 5]); // Beyond the supercell size
         expect(found).to.deep.equal([]);
 
-        found = chamodel._queryCell([1,1,1]);
+        found = chamodel._queryCell([1, 1, 1]);
         expect(found.length).to.equal(chamodel.length);
-        expect(found[0][1]).to.deep.equal([1,1,1]);
+        expect(found[0][1]).to.deep.equal([1, 1, 1]);
+
+        found = pyrmodel._queryBox([-1, -0.5, -2.3], [0, 0.5, 1.7]);
+        found = _.sortBy(found, function(x) {
+            return x[0];
+        });
+        expect(found).to.deep.equal([
+            [0, [0, 0, 0]],
+            [3, [0, 0, 0]],
+            [6, [0, 0, 0]]
+        ]);
+
+        found = simodel._queryBox([-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]);
+        found = _.sortBy(found, function(x) {
+            return x[0];
+        });
+        expect(found).to.deep.equal([
+            [0, [0, 0, 0]],
+            [1, [0, 0, 0]],
+            [3, [-1, -1, 0]],
+            [5, [-1, 0, -1]],
+            [7, [0, -1, -1]]
+        ]);
+
     });
 });
