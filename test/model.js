@@ -5,7 +5,6 @@ const expect = require('chai').expect;
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
-const nm = require('numeric');
 
 const Atoms = require('crystcif-parse').Atoms;
 const Model = require('../lib/model.js').Model;
@@ -102,7 +101,18 @@ describe('#model', function() {
             [7, [0, -1, -1]]
         ]);
 
-        found = simodel._querySphere([-0.5, -0.2, 0], 2.0);
+        found = simodel._querySphere([0, 0, 0], 2.4);
+        found = _.sortBy(found, function(x) {
+            return x[0];
+        });
+
+        expect(found).to.deep.equal([
+            [0, [0, 0, 0]],
+            [1, [0, 0, 0]],
+            [3, [-1, -1, 0]],
+            [5, [-1, 0, -1]],
+            [7, [0, -1, -1]]
+        ]);
 
     });
 });
