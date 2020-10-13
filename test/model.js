@@ -102,5 +102,7 @@ describe('#model', function() {
             [7, [0, -1, -1]]
         ]);
 
+        found = simodel._querySphere([-0.5, -0.2, 0], 2.0);
+
     });
 });

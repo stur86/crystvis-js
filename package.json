@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec",
-    "test-html": "http-server test/test-html & watchify index.js -o test/test-html/testbuild.js"
+    "test-html": "http-server test/test-html & watchify test/test-html/index.js -o test/test-html/testbuild.js"
   },
   "repository": {
     "type": "git",
@@ -25,16 +25,19 @@
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
     "chroma-js": "^2.1.0",
-    "crystcif-parse": "^0.1.5",
+    "crystcif-parse": ">=0.2.0",
     "isosurface": "^1.0.0",
     "jquery": "^3.5.1",
-    "lodash": "^4.17.15",
+    "lodash": ">=4.17.19",
     "three-orbit-controls": "^82.1.0",
-    "three.js": "^0.77.1"
+    "three.js": "^0.77.1",
+    "yargs-parser": "^20.2.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^7.1.2",
+    "elliptic": ">=6.5.3",
+    "minimist": "^1.2.5",
+    "mocha": "^7.2.0",
     "watchify": "^3.11.1"
   }
 }
