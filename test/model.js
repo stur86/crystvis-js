@@ -42,6 +42,16 @@ describe('#atomimage', function() {
             expect(aim.xyz[i]).to.be.closeTo(v, 1e-5);
         });
     });
+    it('should correctly identify equalities', function() {
+        var ai0 = new AtomImage(chamodel, 0, [0, 0, 1]);
+        var ai1 = new AtomImage(chamodel, 0, [0, 0, 1]);
+        var ai2 = new AtomImage(chamodel, 0, [1, 0, 0]);
+        var ai3 = new AtomImage(simodel,  0, [0, 0, 1]);
+
+        expect(ai0.equals(ai1)).to.be.equal(true);
+        expect(ai0.equals(ai2)).to.be.equal(false);
+        expect(ai0.equals(ai3)).to.be.equal(false);
+    });
 });
 
 describe('#model', function() {
@@ -93,6 +103,18 @@ describe('#model', function() {
         found = _.sortBy(found, function(x) {
             return x[0];
         });
+        // Start like this because the supercell grid is limited
+        expect(found).to.deep.equal([
+            [0, [0, 0, 0]],
+            [1, [0, 0, 0]],
+        ]);
+
+        // Expand and repeat
+        simodel.supercell = [3, 3, 3];
+        found = simodel._queryBox([-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]);
+        found = _.sortBy(found, function(x) {
+            return x[0];
+        });
         expect(found).to.deep.equal([
             [0, [0, 0, 0]],
             [1, [0, 0, 0]],
@@ -113,6 +135,15 @@ describe('#model', function() {
             [5, [-1, 0, -1]],
             [7, [0, -1, -1]]
         ]);
+
+        // Test a more complex query
+        found = simodel.find(['$and',
+            ['box', [0,0,0], [2,2,2]], 
+            ['box', [1,1,1], [3,3,3]], 
+        ]);
+
+        expect(found.length).to.equal(1);
+        expect(found[0].index).to.equal(1);
 
     });
 });
