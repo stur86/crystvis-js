@@ -5,16 +5,52 @@ window.$ = require('jquery');
 window.THREE = require('three');
 window.chroma = require('chroma-js');
 
-var Renderer = require('../../lib/render.js').Renderer;
-var Model = require('../../lib/model.js').Model;
-var CrystVis = require('../../lib/visualizer.js').CrystVis;
+
+const expect = require('chai').expect;
+const Renderer = require('../../lib/render.js').Renderer;
+const Model = require('../../lib/model.js').Model;
+const CrystVis = require('../../lib/visualizer.js').CrystVis;
+
+var renderer;
+
+describe('Renderer tests', function() {
+    it('should successfully load a Renderer', function() {
+        renderer = new Renderer('#main-app', 640, 480);
+    });
+    it('should successfully create an atom', function() {
+        var a = renderer._addAtom(new THREE.Vector3(0, 0, 0), 0.5, 0xff0000);
+        expect(a).to.not.equal(null);
+        renderer._removeAtomBond(a);
+    });
+    it('should successfully create a unit cell', function() {
+        var latt = new THREE.Matrix3();
+        latt.set(10, 0, 0, 1, 8, 0, 0, 0, 9).transpose();
+
+        var ba = renderer._addLattice(latt);
+        var box = ba[0];
+        var arrows = ba[1];
+
+        expect(box).to.not.equal(null);
+        expect(arrows).to.not.equal(null);
+
+        renderer._removeLattice(box);
+        renderer._removeLattice(arrows);
+    });
+    it('should successfully create a bond', function() {
+        var b = renderer._addBond(new THREE.Vector3(0, 0, 0),
+                                  new THREE.Vector3(1, 0, 0),
+                                  0.2, 0xff0000, 0x00ff00);
+
+        expect(b).to.not.equal(null);
+
+        renderer._removeAtomBond(b);
+    });
+});
+
 
 // Bootstrap the whole thing!
-var r;
-var box
-var arrows;
-var ellipsoids;
 $(document).ready(function() {
+
 
     // var Atoms = require('crystcif-parse').Atoms;
 
@@ -28,7 +64,7 @@ $(document).ready(function() {
     // var O = new THREE.Vector3(0, 0, 1);
     // var H1 = new THREE.Vector3(0.9, 0, -0.2);
     // var H2 = new THREE.Vector3(-0.9, 0, -0.2);
-    
+
 
     // r._addAtom(O, 0.5, 0xff0000);
     // r._addAtom(H1, 0.35, 0xeeeeee);
@@ -73,7 +109,7 @@ $(document).ready(function() {
     // // });
 
     // // Testing the isosurface
-    
+
     // var N = 20;
     // var sfield = [];
     // for (var x = 0; x < N; x++) {
@@ -92,19 +128,19 @@ $(document).ready(function() {
 
     // r._addSprite(H1, 'circle.png', 1, 0xffffff);
     // 
-    
-    var vs = new CrystVis('.main-app-content', {'width': 640, 'height': 480});
+
+    // var vs = new CrystVis('.main-app-content', {'width': 640, 'height': 480});
 
 });
 
-window.hide_arrows = function() {
-    arrows.visible = !arrows.visible;
-}
+// window.hide_arrows = function() {
+//     arrows.visible = !arrows.visible;
+// }
 
-window.rescale_ellipsoids = function(e) {
-    var s = parseFloat(e.target.value);
+// window.rescale_ellipsoids = function(e) {
+//     var s = parseFloat(e.target.value);
 
-    _.forEach(ellipsoids, function(el) {
-        el._rescale(s);
-    });
-}
+//     _.forEach(ellipsoids, function(el) {
+//         el._rescale(s);
+//     });
+// }

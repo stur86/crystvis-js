@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec",
-    "test-html": "http-server test/test-html & watchify test/test-html/index.js -o test/test-html/testbuild.js"
+    "test-html": "http-server . & watchify test/test-html/index.js -o test/test-html/testbuild.js"
   },
   "repository": {
     "type": "git",
