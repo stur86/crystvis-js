@@ -5,13 +5,14 @@ window.$ = require('jquery');
 window.THREE = require('three');
 window.chroma = require('chroma-js');
 
-
 const expect = require('chai').expect;
 const Renderer = require('../../lib/render.js').Renderer;
 const Model = require('../../lib/model.js').Model;
 const CrystVis = require('../../lib/visualizer.js').CrystVis;
+const exampleFiles = require('./examples.js').exampleFiles;
 
 var renderer;
+var visualizer;
 
 describe('Renderer tests', function() {
     it('should successfully load a Renderer', function() {
@@ -44,6 +45,25 @@ describe('Renderer tests', function() {
         expect(b).to.not.equal(null);
 
         renderer._removeAtomBond(b);
+    });
+
+    after(function() {
+        // Destroy the renderer
+        renderer = null;
+        $('#main-app').empty();
+    });
+});
+
+describe('Visualizer tests', function() {
+    it('should successfully load a CrystVis visualizer', function() {
+        visualizer = new CrystVis('#main-app', {'width': 640, 'height': 480});
+    });
+
+    it('should load new models in the visualizer', function() {
+        var m1 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
+        var m2 = visualizer.loadModels(exampleFiles['org.cif']);
+
+        expect(Object.keys(visualizer._models).sort()).to.deep.equal(['1501936', 'xyz']);
     });
 });
 
