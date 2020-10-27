@@ -46,11 +46,17 @@ describe('#atomimage', function() {
         var ai0 = new AtomImage(chamodel, 0, [0, 0, 1]);
         var ai1 = new AtomImage(chamodel, 0, [0, 0, 1]);
         var ai2 = new AtomImage(chamodel, 0, [1, 0, 0]);
-        var ai3 = new AtomImage(simodel,  0, [0, 0, 1]);
+        var ai3 = new AtomImage(simodel, 0, [0, 0, 1]);
 
         expect(ai0.equals(ai1)).to.be.equal(true);
         expect(ai0.equals(ai2)).to.be.equal(false);
         expect(ai0.equals(ai3)).to.be.equal(false);
+    });
+    it('should correctly generate string IDs', function() {
+
+        var ai = new AtomImage(chamodel, 2, [3, -1, 2]);
+
+        expect(ai.id).to.be.equal('2_3_-1_2');
     });
 });
 
@@ -72,6 +78,10 @@ describe('#model', function() {
         expect(pyrmodel.periodic).to.be.false;
         expect(simodel.periodic).to.be.true;
     });
+
+    it('should behave gracefully in case of non-periodic systems', function() {
+        expect(pyrmodel.cell).to.be.null;
+    })
 
     it('should correctly query for atoms in various ways', function() {
         // Here we only test the raw query functions, not meant for 
@@ -137,9 +147,12 @@ describe('#model', function() {
         ]);
 
         // Test a more complex query
-        found = simodel.find(['$and',
-            ['box', [0,0,0], [2,2,2]], 
-            ['box', [1,1,1], [3,3,3]], 
+        found = simodel.find(['$and', ['box', [0, 0, 0],
+                [2, 2, 2]
+            ],
+            ['box', [1, 1, 1],
+                [3, 3, 3]
+            ],
         ]);
 
         expect(found.length).to.equal(1);

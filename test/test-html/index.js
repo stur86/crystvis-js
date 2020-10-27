@@ -46,6 +46,13 @@ describe('Renderer tests', function() {
 
         renderer._removeAtomBond(b);
     });
+    it('should successfully clear a scene', function() {
+
+        renderer._addAtom(new THREE.Vector3(0, 0, 0), 0.5, 0xff0000);
+
+        renderer.clear();
+
+    });
 
     after(function() {
         // Destroy the renderer
@@ -62,9 +69,18 @@ describe('Visualizer tests', function() {
     it('should load new models in the visualizer', function() {
         var m1 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m2 = visualizer.loadModels(exampleFiles['org.cif']);
+        var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
+        var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);
 
-        expect(Object.keys(visualizer._models).sort()).to.deep.equal(['1501936', 'xyz']);
+        expect(Object.keys(visualizer._models).sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
     });
+
+    it('should correctly visualize a model', function() {
+
+        visualizer.displayModel('I');
+
+    });
+
 });
 
 
