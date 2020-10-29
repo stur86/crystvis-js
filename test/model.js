@@ -26,9 +26,12 @@ var pyr = loader.loadXYZ(xyz);
 var pyrmodel = new Model(pyr);
 
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
-var loader = new Loader();
 var si = loader.loadXYZ(xyz);
 var simodel = new Model(si);
+
+xyz = fs.readFileSync(path.join(__dirname, 'data', 'H2O.xyz'), "utf8");
+var h2o = loader.loadXYZ(xyz);
+var h2omodel = new Model(h2o);
 
 describe('#atomimage', function() {
     it('should correctly compute the periodic copy position', function() {
@@ -158,5 +161,29 @@ describe('#model', function() {
         expect(found.length).to.equal(1);
         expect(found[0].index).to.equal(1);
 
+    });
+
+    it('should identify the right bonds', function() {
+
+        var bonds = h2omodel._bonds;
+
+        expect(bonds[0][1]).to.deep.equal([
+            [0, 0, 0]
+        ]);
+        expect(bonds[0][2]).to.deep.equal([
+            [0, 0, 0]
+        ]);
+        expect(bonds[3][4]).to.deep.equal([
+            [0, 0, -1]
+        ]);
+        expect(bonds[3][5]).to.deep.equal([
+            [0, -1, -1]
+        ]);
+
+    });
+
+    it('should identify the right molecules', function() {
+
+        expect(h2omodel._molinds).to.deep.equal([0, 0, 0, 1, 1, 1]);
     });
 });
