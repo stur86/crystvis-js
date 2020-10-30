@@ -75,14 +75,14 @@ describe('Visualizer tests', function() {
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);
 
-        // expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
+        expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
     });
 
     it('should correctly visualize a model', function() {
 
         this.timeout(5000);
 
-        // visualizer.displayModel('xyz');
+        visualizer.displayModel('xyz');
 
     });
 
