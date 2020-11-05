@@ -82,7 +82,7 @@ describe('Visualizer tests', function() {
 
         this.timeout(5000);
 
-        visualizer.displayModel('xyz');
+        visualizer.displayModel('I');
 
     });
 
