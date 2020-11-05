@@ -15,6 +15,7 @@ const Loader = require('../lib/loader.js').Loader;
 var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
 var cha = Atoms.readCif(cif)['CHA'];
 var chamodel = new Model(cha);
+var chamodel3 = new Model(cha, [3,3,3]);
 
 cif = fs.readFileSync(path.join(__dirname, 'data', 'org.cif'), "utf8");
 var org = Atoms.readCif(cif)['1501936'];
@@ -28,6 +29,7 @@ var pyrmodel = new Model(pyr);
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
 var si = loader.loadXYZ(xyz);
 var simodel = new Model(si);
+var simodel3 = new Model(si, [3,3,3]);
 
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'H2O.xyz'), "utf8");
 var h2o = loader.loadXYZ(xyz);
@@ -59,14 +61,22 @@ describe('#atomimage', function() {
 
         var ai = new AtomImage(chamodel, 2, [3, -1, 2]);
 
-        expect(ai.id).to.be.equal('2_3_-1_2');
+        expect(ai.id).to.equal('2_3_-1_2');
     });
+    it('should correctly calculate its integer index', function() {
+
+        for (var i = 0; i < simodel3.images.length; ++i) {
+            var ai = simodel3.images[i];
+            expect(ai.img_index).to.equal(i);
+        }
+
+    })
 });
 
 describe('#model', function() {
+
     it('should correctly compute a supercell grid', function() {
-        chamodel.supercell = [3, 3, 3];
-        expect(chamodel.supercell_grid.length).to.be.equal(27);
+        expect(chamodel3.supercell_grid.length).to.be.equal(27);
     });
 
     it('should correctly compute the minimum supercell for given radii', function() {
@@ -84,73 +94,44 @@ describe('#model', function() {
 
     it('should behave gracefully in case of non-periodic systems', function() {
         expect(pyrmodel.cell).to.be.null;
-    })
+    });
 
     it('should correctly query for atoms in various ways', function() {
         // Here we only test the raw query functions, not meant for 
         // public use
 
         var found = pyrmodel._queryElements(['C']);
-        expect(_.map(found, function(v) {
-            return v[0];
-        })).to.deep.equal([0, 1, 2, 4, 5]);
+        expect(found).to.deep.equal([0, 1, 2, 4, 5]);
 
         found = chamodel._queryCell([5, 5, 5]); // Beyond the supercell size
         expect(found).to.deep.equal([]);
 
-        found = chamodel._queryCell([1, 1, 1]);
+        found = chamodel3._queryCell([1, 1, 1]);
         expect(found.length).to.equal(chamodel.length);
-        expect(found[0][1]).to.deep.equal([1, 1, 1]);
+        expect(found[0]).to.equal(26*chamodel.length);
 
         found = pyrmodel._queryBox([-1, -0.5, -2.3], [0, 0.5, 1.7]);
         found = _.sortBy(found, function(x) {
             return x[0];
         });
-        expect(found).to.deep.equal([
-            [0, [0, 0, 0]],
-            [3, [0, 0, 0]],
-            [6, [0, 0, 0]]
-        ]);
+        expect(found).to.deep.equal([0, 3, 6]);
 
         found = simodel._queryBox([-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]);
-        found = _.sortBy(found, function(x) {
-            return x[0];
-        });
-        // Start like this because the supercell grid is limited
-        expect(found).to.deep.equal([
-            [0, [0, 0, 0]],
-            [1, [0, 0, 0]],
-        ]);
+        expect(found).to.deep.equal([0, 1]);
 
-        // Expand and repeat
-        simodel.supercell = [3, 3, 3];
-        found = simodel._queryBox([-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]);
-        found = _.sortBy(found, function(x) {
-            return x[0];
-        });
-        expect(found).to.deep.equal([
-            [0, [0, 0, 0]],
-            [1, [0, 0, 0]],
-            [3, [-1, -1, 0]],
-            [5, [-1, 0, -1]],
-            [7, [0, -1, -1]]
-        ]);
+        // Bigger supercell
+        found = simodel3._queryBox([-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]);
+        expect(found).to.deep.equal([11, 29, 79, 104, 105]);
 
-        found = simodel._querySphere([0, 0, 0], 2.4);
+        found = simodel3._querySphere([0, 0, 0], 2.4);
         found = _.sortBy(found, function(x) {
             return x[0];
         });
 
-        expect(found).to.deep.equal([
-            [0, [0, 0, 0]],
-            [1, [0, 0, 0]],
-            [3, [-1, -1, 0]],
-            [5, [-1, 0, -1]],
-            [7, [0, -1, -1]]
-        ]);
+        expect(found).to.deep.equal([11, 29, 79, 104, 105])
 
         // Test a more complex query
-        found = simodel.find(['$and', ['box', [0, 0, 0],
+        found = simodel3.find(['$and', ['box', [0, 0, 0],
                 [2, 2, 2]
             ],
             ['box', [1, 1, 1],
