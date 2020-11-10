@@ -70,7 +70,7 @@ describe('Visualizer tests', function() {
 
         this.timeout(10000);
 
-        var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz');
+        var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz', 'xyz', [3,3,3]);
         var m2 = visualizer.loadModels(exampleFiles['org.cif']);
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);

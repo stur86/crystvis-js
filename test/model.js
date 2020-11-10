@@ -124,11 +124,14 @@ describe('#model', function() {
         expect(found).to.deep.equal([11, 29, 79, 104, 105]);
 
         found = simodel3._querySphere([0, 0, 0], 2.4);
-        found = _.sortBy(found, function(x) {
-            return x[0];
-        });
+        // found = _.sortBy(found, function(x) {
+        //     return x[0];
+        // });
+        expect(found).to.deep.equal([11, 29, 79, 104, 105]);
 
-        expect(found).to.deep.equal([11, 29, 79, 104, 105])
+        // Using an atom as the centre
+        found = simodel._querySphere(simodel.images[0], 2.4);
+        expect(found).to.deep.equal([0, 1]);
 
         // Test a more complex query
         found = simodel3.find(['$and', ['box', [0, 0, 0],
@@ -146,7 +149,7 @@ describe('#model', function() {
 
     it('should identify the right bonds', function() {
 
-        var bonds = h2omodel._bonds;
+        var bonds = h2omodel._bondmat;
 
         expect(bonds[0][1]).to.deep.equal([
             [0, 0, 0]
