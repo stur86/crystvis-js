@@ -15,7 +15,7 @@ const Loader = require('../lib/loader.js').Loader;
 var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
 var cha = Atoms.readCif(cif)['CHA'];
 var chamodel = new Model(cha);
-var chamodel3 = new Model(cha, [3,3,3]);
+var chamodel3 = new Model(cha, [3, 3, 3]);
 
 cif = fs.readFileSync(path.join(__dirname, 'data', 'org.cif'), "utf8");
 var org = Atoms.readCif(cif)['1501936'];
@@ -29,7 +29,7 @@ var pyrmodel = new Model(pyr);
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
 var si = loader.loadXYZ(xyz);
 var simodel = new Model(si);
-var simodel3 = new Model(si, [3,3,3]);
+var simodel3 = new Model(si, [3, 3, 3]);
 
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'H2O.xyz'), "utf8");
 var h2o = loader.loadXYZ(xyz);
@@ -108,7 +108,7 @@ describe('#model', function() {
 
         found = chamodel3._queryCell([1, 1, 1]);
         expect(found.length).to.equal(chamodel.length);
-        expect(found[0]).to.equal(26*chamodel.length);
+        expect(found[0]).to.equal(26 * chamodel.length);
 
         found = pyrmodel._queryBox([-1, -0.5, -2.3], [0, 0.5, 1.7]);
         found = _.sortBy(found, function(x) {
@@ -143,7 +143,7 @@ describe('#model', function() {
         ]);
 
         expect(found.length).to.equal(1);
-        expect(found[0].index).to.equal(1);
+        expect(found.images[0].index).to.equal(1);
 
     });
 
@@ -170,4 +170,36 @@ describe('#model', function() {
 
         expect(h2omodel._molinds).to.deep.equal([0, 0, 0, 1, 1, 1]);
     });
+});
+
+describe('#modelview', function() {
+
+    it('should correctly AND two successive queries', function() {
+
+        var mv1 = h2omodel.find(['cell', [0, 0, 0]]);
+        var mv2 = mv1.find(['elements', 'O']);
+        expect(mv2.indices).to.deep.equal([0, 3]);
+
+    });
+
+    it('should correctly perform boolean operations between views', function() {
+
+        var mv1 = h2omodel.find(['elements', 'O']);
+        var mv2 = h2omodel.find(['elements', 'H']);
+
+        var mvAnd = mv1.and(mv2);
+        expect(mvAnd.length).to.equal(0);
+
+        var mvOr = mv1.or(mv2);
+        expect(mvOr.indices.sort()).to.deep.equal([0, 1, 2, 3, 4, 5]);
+
+        // Throw exception
+        var mv3 = simodel.find(['all']);
+
+        expect(function() {
+            mv1.and(mv3);
+        }).to.throw('The two ModelViews do not refer to the same Model');
+
+    });
+
 });
