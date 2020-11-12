@@ -50,7 +50,7 @@ describe('Renderer tests', function() {
 
         renderer._addAtom(new THREE.Vector3(0, 0, 0), 0.5, 0xff0000);
 
-        renderer.clear();
+        renderer.removeAllObjects();
 
     });
 
@@ -68,8 +68,6 @@ describe('Visualizer tests', function() {
 
     it('should load new models in the visualizer', function() {
 
-        this.timeout(10000);
-
         var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz', 'xyz', [3,3,3]);
         var m2 = visualizer.loadModels(exampleFiles['org.cif']);
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
@@ -80,10 +78,19 @@ describe('Visualizer tests', function() {
 
     it('should correctly visualize a model', function() {
 
-        this.timeout(5000);
-
         visualizer.displayModel('I');
 
+    });
+
+    it('should correctly apply changes in properties to the displayed atoms', function() {
+
+        visualizer.displayed.setColor(0xff0000);
+        visualizer.displayed.setColor();
+
+        visualizer.displayed.setOpacity(0.4);        
+        visualizer.displayed.setOpacity();
+
+        visualizer.displayed.find(['elements', 'O']).images[0].addLabel('Hello World', [0, 0, 0], 'test');
     });
 
 });

@@ -30,8 +30,8 @@
     "jquery": "^3.5.1",
     "lodash": ">=4.17.20",
     "mathjs": "^7.5.1",
+    "three": "^0.122.0",
     "three-orbit-controls": "^82.1.0",
-    "three.js": "^0.77.1",
     "yargs-parser": "^20.2.0"
   },
   "devDependencies": {

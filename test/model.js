@@ -8,6 +8,7 @@ const path = require('path');
 
 const Atoms = require('crystcif-parse').Atoms;
 const Model = require('../lib/model.js').Model;
+const ModelView = require('../lib/modelview.js').ModelView;
 const AtomImage = require('../lib/model.js').AtomImage;
 const Loader = require('../lib/loader.js').Loader;
 
@@ -186,6 +187,7 @@ describe('#modelview', function() {
 
         var mv1 = h2omodel.find(['elements', 'O']);
         var mv2 = h2omodel.find(['elements', 'H']);
+        var mv3 = h2omodel.find(['sphere', [0, 0, 0], 1]);
 
         var mvAnd = mv1.and(mv2);
         expect(mvAnd.length).to.equal(0);
@@ -193,12 +195,18 @@ describe('#modelview', function() {
         var mvOr = mv1.or(mv2);
         expect(mvOr.indices.sort()).to.deep.equal([0, 1, 2, 3, 4, 5]);
 
+        var mvXor = mv1.xor(mv3);
+        expect(mvXor.indices.sort()).to.deep.equal([1, 2, 3]);
+
+        var mvNot = mv3.not();
+        expect(mvNot.indices.sort()).to.deep.equal([3, 4, 5]);
+
         // Throw exception
-        var mv3 = simodel.find(['all']);
+        var mvSi = simodel.find(['all']);
 
         expect(function() {
-            mv1.and(mv3);
-        }).to.throw('The two ModelViews do not refer to the same Model');
+            mv1.and(mvSi);
+        }).to.throw('The two ModelViews do not refer to the same Model');       
 
     });
 
