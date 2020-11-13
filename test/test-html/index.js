@@ -90,7 +90,14 @@ describe('Visualizer tests', function() {
         visualizer.displayed.setOpacity(0.4);        
         visualizer.displayed.setOpacity();
 
-        visualizer.displayed.find(['elements', 'O']).images[0].addLabel('Hello World', [0, 0, 0], 'test');
+        visualizer.displayed.addLabels();
+        visualizer.displayed.addLabels(function(a, i) {
+            return a.radius;
+        }, 'radius', {
+            'shiftY': -1,
+            'textColor': 0xff0000
+        });
+
     });
 
 });
