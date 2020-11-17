@@ -12,7 +12,7 @@ window.loadFile = function() {
     reader.readAsText(file);
     reader.onload = function() {
         var name = file.name.split('.')[0];
-        visualizer.loadModels(reader.result, extension, name);
-        visualizer.displayModel(name);
+        var loaded = visualizer.loadModels(reader.result, extension, name);
+        visualizer.displayModel(loaded[0]);
     };
 }
