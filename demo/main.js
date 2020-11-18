@@ -8,11 +8,20 @@ window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
     var reader = new FileReader();
     var extension = file.name.split('.').pop();
+
+    var sx = parseInt(document.getElementById("scell-x").value) || 1;
+    var sy = parseInt(document.getElementById("scell-y").value) || 1;
+    var sz = parseInt(document.getElementById("scell-z").value) || 1;
     
     reader.readAsText(file);
     reader.onload = function() {
         var name = file.name.split('.')[0];
-        var loaded = visualizer.loadModels(reader.result, extension, name);
+        var loaded = visualizer.loadModels(reader.result, extension, name, [sx, sy, sz]);
         visualizer.displayModel(loaded[0]);
     };
+}
+
+window.changeDisplayed = function(query) {
+    var select = visualizer.model.find(query);
+    visualizer.displayed = select;
 }
