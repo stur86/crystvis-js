@@ -3,9 +3,26 @@
   "version": "0.1.0",
   "description": "A Three.js based crystallographic visualisation tool",
   "main": "index.js",
+  "type": "module",
+  "watch": {
+    "build-demo": {
+      "patterns": [
+        "demo/main.js",
+        "lib/*.js"
+      ]
+    },
+    "build-html-test": {
+      "patterns": [
+        "test/test-html/index.js",
+        "lib/*.js"
+      ]
+    }
+  },
   "scripts": {
     "test": "mocha --reporter spec",
-    "test-server": "http-server . & watchify demo/main.js -o demo/demo.js & watchify --debug test/test-html/index.js -o test/test-html/testbuild.js"
+    "build-demo": "esbuild demo/main.js --bundle --outfile=demo/demo.js",
+    "build-html-test": "esbuild test/test-html/index.js --bundle --outfile=test/test-html/testbuild.js",
+    "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test"
   },
   "repository": {
     "type": "git",
@@ -31,16 +48,16 @@
     "lodash": ">=4.17.20",
     "mathjs": "^7.6.0",
     "three": "^0.122.0",
-    "three-orbit-controls": "^82.1.0",
     "yargs-parser": "^20.2.4"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-almost": "^1.0.1",
     "elliptic": ">=6.5.3",
+    "esbuild": "^0.8.11",
     "http-server": "^0.12.3",
     "minimist": "^1.2.5",
     "mocha": "^7.2.0",
-    "watchify": "^3.11.1"
+    "npm-watch": "^0.7.0"
   }
 }
