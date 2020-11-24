@@ -20,6 +20,7 @@
   },
   "scripts": {
     "test": "mocha --reporter spec",
+    "build-assets": "node assets/build_assets.js",
     "build-demo": "esbuild demo/main.js --bundle --outfile=demo/demo.js",
     "build-html-test": "esbuild test/test-html/index.js --bundle --outfile=test/test-html/testbuild.js",
     "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test"
@@ -42,7 +43,7 @@
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
     "chroma-js": "^2.1.0",
-    "crystcif-parse": "^0.2.1",
+    "crystcif-parse": ">=0.2.2",
     "isosurface": "^1.0.0",
     "jquery": "^3.5.1",
     "lodash": ">=4.17.20",
@@ -53,6 +54,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-almost": "^1.0.1",
+    "datauri": "^3.0.0",
     "elliptic": ">=6.5.3",
     "esbuild": "^0.8.11",
     "http-server": "^0.12.3",
