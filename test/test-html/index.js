@@ -63,7 +63,7 @@ describe('Renderer tests', function() {
 
 describe('Visualizer tests', function() {
     it('should successfully load a CrystVis visualizer', function() {
-        visualizer = new CrystVis('#main-app', {'width': 640, 'height': 480});
+        visualizer = new CrystVis('#main-app', 640, 480);
     });
 
     it('should load new models in the visualizer', function() {

@@ -2,7 +2,8 @@
 
 const CrystVis = require('../lib/visualizer.js').CrystVis;
 
-var visualizer = new CrystVis('#main-app', {'width': 640, 'height': 480});
+var visualizer = new CrystVis('#main-app', 640, 480);
+visualizer.highlight_selected = true;
 
 window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
