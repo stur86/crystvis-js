@@ -5,6 +5,13 @@ const CrystVis = require('../lib/visualizer.js').CrystVis;
 var visualizer = new CrystVis('#main-app', 640, 480);
 visualizer.highlight_selected = true;
 
+visualizer.action_atom_click_middle = function(c) {
+    console.log(c);
+}
+visualizer.action_atom_click_right = function(c) {
+    console.log('Wrong button!');
+}
+
 window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
     var reader = new FileReader();
@@ -19,6 +26,8 @@ window.loadFile = function() {
         var name = file.name.split('.')[0];
         var loaded = visualizer.loadModels(reader.result, extension, name, [sx, sy, sz]);
         visualizer.displayModel(loaded[0]);
+        visualizer.displayed = visualizer.model.find(['all']);
+        visualizer.displayed = visualizer.model.find(['cell', [0,0,0]]);
     };
 }
 
