@@ -66,8 +66,8 @@ describe('#atomimage', function() {
     });
     it('should correctly calculate its integer index', function() {
 
-        for (var i = 0; i < simodel3.images.length; ++i) {
-            var ai = simodel3.images[i];
+        for (var i = 0; i < simodel3.atoms.length; ++i) {
+            var ai = simodel3.atoms[i];
             expect(ai.img_index).to.equal(i);
         }
 
@@ -131,7 +131,7 @@ describe('#model', function() {
         expect(found).to.deep.equal([11, 29, 79, 104, 105]);
 
         // Using an atom as the centre
-        found = simodel._querySphere(simodel.images[0], 2.4);
+        found = simodel._querySphere(simodel.atoms[0], 2.4);
         expect(found).to.deep.equal([0, 1]);
 
         // Test a more complex query
@@ -144,7 +144,7 @@ describe('#model', function() {
         ]);
 
         expect(found.length).to.equal(1);
-        expect(found.images[0].index).to.equal(1);
+        expect(found.atoms[0].index).to.equal(1);
 
     });
 
