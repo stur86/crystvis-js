@@ -28,6 +28,8 @@ window.loadFile = function() {
         visualizer.displayModel(loaded[0]);
         visualizer.displayed = visualizer.model.find(['all']);
         visualizer.displayed = visualizer.model.find(['cell', [0,0,0]]);
+
+        visualizer.displayed.addLabels();
     };
 }
 
