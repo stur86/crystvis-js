@@ -27,13 +27,21 @@ window.loadFile = function() {
         var loaded = visualizer.loadModels(reader.result, extension, name, [sx, sy, sz]);
         visualizer.displayModel(loaded[0]);
         visualizer.displayed = visualizer.model.find(['all']);
-        visualizer.displayed = visualizer.model.find(['cell', [0,0,0]]);
-
-        visualizer.displayed.addLabels();
+        //visualizer.displayed = visualizer.model.find(['cell', [0,0,0]]);
     };
 }
 
 window.changeDisplayed = function(query) {
     var select = visualizer.model.find(query);
     visualizer.displayed = select;
+}
+
+window.changeLabels = function() {
+    var val = document.getElementById('label-check').checked;
+    if (val) {
+        visualizer.displayed.addLabels();
+    }
+    else {
+        visualizer.displayed.removeLabels();
+    }
 }
