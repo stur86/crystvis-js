@@ -43,7 +43,7 @@
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
     "chroma-js": "^2.1.0",
-    "crystcif-parse": ">=0.2.3",
+    "crystcif-parse": ">=0.2.4",
     "isosurface": "^1.0.0",
     "jquery": "^3.5.1",
     "lodash": ">=4.17.20",
