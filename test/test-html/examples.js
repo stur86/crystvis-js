@@ -1244,4 +1244,4 @@ RESPONSE: Example CIF
 `
 
 
-exports.exampleFiles = exampleFiles;
+export { exampleFiles }

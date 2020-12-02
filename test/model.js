@@ -1,16 +1,20 @@
 'use strict';
 
-const expect = require('chai').expect;
 
-const _ = require('lodash');
-const fs = require('fs');
-const path = require('path');
+import chai from 'chai'
 
-const Atoms = require('crystcif-parse').Atoms;
-const Model = require('../lib/model.js').Model;
-const ModelView = require('../lib/modelview.js').ModelView;
-const AtomImage = require('../lib/model.js').AtomImage;
-const Loader = require('../lib/loader.js').Loader;
+import _ from 'lodash';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import { Atoms as Atoms } from 'crystcif-parse';
+import { Model, AtomImage } from '../lib/model.js';
+import { ModelView as ModelView } from '../lib/modelview.js';
+import { Loader as Loader } from '../lib/loader.js';
+
+const expect = chai.expect
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Load test files
 var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
@@ -125,9 +129,6 @@ describe('#model', function() {
         expect(found).to.deep.equal([11, 29, 79, 104, 105]);
 
         found = simodel3._querySphere([0, 0, 0], 2.4);
-        // found = _.sortBy(found, function(x) {
-        //     return x[0];
-        // });
         expect(found).to.deep.equal([11, 29, 79, 104, 105]);
 
         // Using an atom as the centre

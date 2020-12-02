@@ -1,15 +1,16 @@
 'use strict';
 
-window._ = require('lodash');
-window.$ = require('jquery');
-window.THREE = require('three');
-window.chroma = require('chroma-js');
+import _ from 'lodash';
+import $ from 'jquery';
+import * as THREE from 'three';
+import chroma from 'chroma-js';
 
-const expect = require('chai').expect;
-const Renderer = require('../../lib/render.js').Renderer;
-const Model = require('../../lib/model.js').Model;
-const CrystVis = require('../../lib/visualizer.js').CrystVis;
-const exampleFiles = require('./examples.js').exampleFiles;
+import chai from 'chai';
+import { Renderer } from '../../lib/render.js';
+import { Model } from '../../lib/model.js';
+import { CrystVis } from '../../lib/visualizer.js';
+import * as Graphics from '../../lib/graphics.js';
+import { exampleFiles } from './examples.js';
 
 var renderer;
 var visualizer;
@@ -19,38 +20,41 @@ describe('Renderer tests', function() {
         renderer = new Renderer('#main-app', 640, 480);
     });
     it('should successfully create an atom', function() {
-        var a = renderer._addAtom(new THREE.Vector3(0, 0, 0), 0.5, 0xff0000);
-        expect(a).to.not.equal(null);
+        var a = new Graphics.AtomMesh([0,0,0], 0.5, 0xff0000);
+        renderer._addAtomBond(a);
+        chai.expect(renderer._g._ab.children).to.include(a);
         renderer._removeAtomBond(a);
     });
     it('should successfully create a unit cell', function() {
         var latt = new THREE.Matrix3();
         latt.set(10, 0, 0, 1, 8, 0, 0, 0, 9).transpose();
 
-        var ba = renderer._addLattice(latt);
-        var box = ba[0];
-        var arrows = ba[1];
+        var box = new Graphics.BoxMesh(latt);
+        var ax = new Graphics.AxesMesh(latt);
 
-        expect(box).to.not.equal(null);
-        expect(arrows).to.not.equal(null);
+        renderer._addLattice(box);
+        renderer._addLattice(ax);
+
+        chai.expect(renderer._g._latt.children).to.include.members([box, ax]);
 
         renderer._removeLattice(box);
-        renderer._removeLattice(arrows);
+        renderer._removeLattice(ax);
     });
     it('should successfully create a bond', function() {
-        var b = renderer._addBond(new THREE.Vector3(0, 0, 0),
-                                  new THREE.Vector3(1, 0, 0),
-                                  0.2, 0xff0000, 0x00ff00);
+        var b = new Graphics.BondMesh([0,0,0], [1,0,0]);
 
-        expect(b).to.not.equal(null);
+        renderer._addAtomBond(b);
+
+        chai.expect(renderer._g._ab.children).to.include(b);
 
         renderer._removeAtomBond(b);
     });
     it('should successfully clear a scene', function() {
 
-        renderer._addAtom(new THREE.Vector3(0, 0, 0), 0.5, 0xff0000);
+        var a = new Graphics.AtomMesh([0,0,0], 0.5, 0xff0000);
+        renderer._addAtomBond(a);
 
-        renderer.removeAllObjects();
+        renderer.clear();
 
     });
 
@@ -73,7 +77,7 @@ describe('Visualizer tests', function() {
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);
 
-        expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
+        chai.expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
     });
 
     it('should correctly visualize a model', function() {

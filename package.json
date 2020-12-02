@@ -46,8 +46,8 @@
     "crystcif-parse": ">=0.2.4",
     "isosurface": "^1.0.0",
     "jquery": "^3.5.1",
-    "lodash": ">=4.17.20",
-    "mathjs": "^7.6.0",
+    "lodash": "^4.17.20",
+    "mathjs": "^8.0.1",
     "three": "^0.122.0",
     "yargs-parser": "^20.2.4"
   },
@@ -56,10 +56,10 @@
     "chai-almost": "^1.0.1",
     "datauri": "^3.0.0",
     "elliptic": ">=6.5.3",
-    "esbuild": "^0.8.11",
+    "esbuild": "^0.8.17",
     "http-server": "^0.12.3",
     "minimist": "^1.2.5",
-    "mocha": "^7.2.0",
+    "mocha": "^8.2.1",
     "npm-watch": "^0.7.0"
   }
 }

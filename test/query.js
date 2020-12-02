@@ -1,9 +1,11 @@
 'use strict';
 
-const expect = require('chai').expect;
+import chai from 'chai';
 
-const _ = require('lodash')
-const QueryParser = require('../lib/query.js').QueryParser;
+import _ from 'lodash'
+import { QueryParser as QueryParser } from '../lib/query.js';
+
+const expect = chai.expect;
 
 // Create a test object for queries
 var QuerySandbox = function (n) {

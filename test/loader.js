@@ -1,12 +1,17 @@
 'use strict';
 
-const chai = require('chai');
-const chaiAlmost = require('chai-almost');
-const expect = chai.expect
+import chai from 'chai'
+import chaiAlmost from 'chai-almost'
 
-const fs = require('fs');
-const path = require('path');
-const Loader = require('../lib/loader.js').Loader;
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url';
+
+import { Loader } from '../lib/loader.js'
+
+const expect = chai.expect
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 chai.use(chaiAlmost(1e-3));
 

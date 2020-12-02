@@ -12,6 +12,8 @@ visualizer.action_atom_click_right = function(c) {
     console.log('Wrong button!');
 }
 
+visualizer.onAtomClick();
+
 window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
     var reader = new FileReader();
