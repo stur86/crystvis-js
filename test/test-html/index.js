@@ -9,7 +9,9 @@ import chai from 'chai';
 import { Renderer } from '../../lib/render.js';
 import { Model } from '../../lib/model.js';
 import { CrystVis } from '../../lib/visualizer.js';
+import { assets } from '../../lib/assets.js';
 import * as Graphics from '../../lib/graphics.js';
+
 import { exampleFiles } from './examples.js';
 
 var renderer;
@@ -48,6 +50,17 @@ describe('Renderer tests', function() {
         chai.expect(renderer._g._ab.children).to.include(b);
 
         renderer._removeAtomBond(b);
+    });
+    it('should successfully render sprites', function() {
+        var s = new Graphics.ImageSprite([0, 0, 0], assets['circle.png']);
+        renderer._addSprite(s);
+        var ts = new Graphics.LabelSprite('Hello world');
+        renderer._addSprite(ts);
+
+        chai.expect(renderer._g._sprites.children).to.include.members([s, ts]);
+
+        renderer._removeSprite(s);
+        renderer._removeSprite(ts);
     });
     it('should successfully clear a scene', function() {
 
