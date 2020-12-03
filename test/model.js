@@ -88,6 +88,15 @@ describe('#atomimage', function() {
         expect(a.bonded_atoms).to.deep.equal([atoms[1], atoms[2]]);
 
     });
+    it('should correctly retrieve a corresponding array value', function() {
+
+        simodel.setArray('test_arr', _.range(simodel.length));
+
+        for (var i = 0; i < simodel.length; ++i) {
+            expect(simodel.atoms[i].getArrayValue('test_arr'), i);
+        }
+
+    });
 });
 
 describe('#bondimage', function() {
