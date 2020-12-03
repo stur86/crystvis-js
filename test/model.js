@@ -2,6 +2,7 @@
 
 
 import chai from 'chai'
+import chaiAlmost from 'chai-almost'
 
 import _ from 'lodash';
 import fs from 'fs';
@@ -9,9 +10,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { Atoms as Atoms } from 'crystcif-parse';
-import { Model, AtomImage } from '../lib/model.js';
+import { Model, AtomImage, BondImage } from '../lib/model.js';
 import { ModelView as ModelView } from '../lib/modelview.js';
 import { Loader as Loader } from '../lib/loader.js';
+
+chai.use(chaiAlmost(1e-3));
 
 const expect = chai.expect
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -74,8 +77,29 @@ describe('#atomimage', function() {
             var ai = simodel3.atoms[i];
             expect(ai.img_index).to.equal(i);
         }
+    });
+    it('should correctly identify the closest bonding neighbours', function() {
 
-    })
+        // This one relies on Model to compute the right bonds
+        
+        var atoms = h2omodel.atoms;
+        var a = atoms[0];
+
+        expect(a.bonded_atoms).to.deep.equal([atoms[1], atoms[2]]);
+
+    });
+});
+
+describe('#bondimage', function() {
+    it('should correctly compute the distance between atoms in the bond', function() {
+
+        var a1 = new AtomImage(h2omodel, 0, [0,0,0]);
+        var a2 = new AtomImage(h2omodel, 1, [0,0,0]);
+
+        var b = new BondImage(h2omodel, a1, a2);
+
+        expect(b.length).to.almost.equal(0.9686);
+    });
 });
 
 describe('#model', function() {
@@ -116,9 +140,7 @@ describe('#model', function() {
         expect(found[0]).to.equal(26 * chamodel.length);
 
         found = pyrmodel._queryBox([-1, -0.5, -2.3], [0, 0.5, 1.7]);
-        found = _.sortBy(found, function(x) {
-            return x[0];
-        });
+        found.sort();
         expect(found).to.deep.equal([0, 3, 6]);
 
         found = simodel._queryBox([-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]);
@@ -134,6 +156,24 @@ describe('#model', function() {
         // Using an atom as the centre
         found = simodel._querySphere(simodel.atoms[0], 2.4);
         expect(found).to.deep.equal([0, 1]);
+
+        // Bonds
+        found = h2omodel._queryBonded(h2omodel.atoms[0]);
+        expect(found).to.deep.equal([1, 2]);
+        found = h2omodel._queryBonded(h2omodel.atoms[0], 2);
+        expect(found).to.deep.equal([1, 2]);
+        found = h2omodel._queryBonded(h2omodel.atoms[0], 2, true);
+        expect(found.length).to.equal(0);
+        found = pyrmodel._queryBonded(pyrmodel.atoms[3], 2, true);
+        found.sort();
+        expect(found).to.deep.equal([1, 5, 8, 9]);
+
+        // Molecules
+        found = h2omodel._queryMolecule(h2omodel.atoms[0]);
+        found.sort();
+        expect(found).to.deep.equal([0, 1, 2]);
+        found = h2omodel._queryMolecule(h2omodel.atoms[3]); // Out of bounds
+        expect(found).to.deep.equal([3]);
 
         // Test a more complex query
         found = simodel3.find(['$and', ['box', [0, 0, 0],
@@ -164,13 +204,14 @@ describe('#model', function() {
         ]);
         expect(bonds[3][5]).to.deep.equal([
             [0, -1, -1]
-        ]);
+        ]);        
 
     });
 
     it('should identify the right molecules', function() {
 
         expect(h2omodel._molinds).to.deep.equal([0, 0, 0, 1, 1, 1]);
+
     });
 });
 
