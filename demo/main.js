@@ -5,13 +5,6 @@ const CrystVis = require('../lib/visualizer.js').CrystVis;
 var visualizer = new CrystVis('#main-app', 640, 480);
 visualizer.highlight_selected = true;
 
-visualizer.action_atom_click_middle = function(c) {
-    console.log(c);
-}
-visualizer.action_atom_click_right = function(c) {
-    console.log('Wrong button!');
-}
-
 visualizer.onAtomClick();
 
 window.loadFile = function() {
