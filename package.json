@@ -8,21 +8,23 @@
     "build-demo": {
       "patterns": [
         "demo/main.js",
-        "lib/*.js"
+        "lib/*.js",
+        "assets/*"
       ]
     },
     "build-html-test": {
       "patterns": [
         "test/test-html/index.js",
-        "lib/*.js"
+        "lib/*.js",
+        "assets/*"
       ]
     }
   },
   "scripts": {
     "test": "mocha --reporter spec",
     "build-assets": "node assets/build_assets.js",
-    "build-demo": "esbuild demo/main.js --bundle --outfile=demo/demo.js",
-    "build-html-test": "esbuild test/test-html/index.js --bundle --outfile=test/test-html/testbuild.js",
+    "build-demo": "esbuild demo/main.js --bundle --loader:.png=dataurl --outfile=demo/demo.js",
+    "build-html-test": "esbuild test/test-html/index.js --bundle --loader:.png=dataurl --outfile=test/test-html/testbuild.js",
     "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test"
   },
   "repository": {

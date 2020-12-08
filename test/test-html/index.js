@@ -9,8 +9,8 @@ import chai from 'chai';
 import { Renderer } from '../../lib/render.js';
 import { Model } from '../../lib/model.js';
 import { CrystVis } from '../../lib/visualizer.js';
-import { assets } from '../../lib/assets.js';
 import * as Graphics from '../../lib/graphics.js';
+import circle_sprite from '../../assets/circle.png';
 
 import { exampleFiles } from './examples.js';
 
@@ -52,7 +52,7 @@ describe('Renderer tests', function() {
         renderer._removeAtomBond(b);
     });
     it('should successfully render sprites', function() {
-        var s = new Graphics.ImageSprite([0, 0, 0], assets['circle.png']);
+        var s = new Graphics.ImageSprite([0, 0, 0], circle_sprite);
         renderer._addSprite(s);
         var ts = new Graphics.LabelSprite('Hello world');
         renderer._addSprite(ts);
@@ -89,6 +89,7 @@ describe('Visualizer tests', function() {
         var m2 = visualizer.loadModels(exampleFiles['org.cif']);
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);
+        var m5 = visualizer.loadModels(exampleFiles['ethanol.magres'], 'magres');
 
         chai.expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
     });
