@@ -23,8 +23,8 @@
   "scripts": {
     "test": "mocha --reporter spec",
     "build-assets": "node assets/build_assets.js",
-    "build-demo": "esbuild demo/main.js --bundle --loader:.png=dataurl --outfile=demo/demo.js",
-    "build-html-test": "esbuild test/test-html/index.js --bundle --loader:.png=dataurl --outfile=test/test-html/testbuild.js",
+    "build-demo": "node scripts/build-bundle.js demo/main.js demo/demo.js",
+    "build-html-test": "node scripts/build-bundle.js test/test-html/index.js test/test-html/testbuild.js",
     "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test"
   },
   "repository": {
