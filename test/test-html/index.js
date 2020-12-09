@@ -10,7 +10,7 @@ import { Renderer } from '../../lib/render.js';
 import { Model } from '../../lib/model.js';
 import { CrystVis } from '../../lib/visualizer.js';
 import * as Graphics from '../../lib/graphics.js';
-import circle_sprite from '../../assets/circle.png';
+import circle_sprite from '../../lib/assets/circle.png';
 
 import { exampleFiles } from './examples.js';
 
