@@ -8,21 +8,21 @@
     "build-demo": {
       "patterns": [
         "demo/main.js",
-        "lib/*.js",
-        "assets/*"
+        "lib/*",
+        "lib/*/*"
       ]
     },
     "build-html-test": {
       "patterns": [
         "test/test-html/index.js",
-        "lib/*.js",
-        "assets/*"
+        "lib/*",
+        "lib/*/*"
       ]
     }
   },
   "scripts": {
     "test": "mocha --reporter spec",
-    "build-assets": "node assets/build_assets.js",
+    "build-fonts": "node scripts/build-fonts.js",
     "build-demo": "node scripts/build-bundle.js demo/main.js demo/demo.js",
     "build-html-test": "node scripts/build-bundle.js test/test-html/index.js test/test-html/testbuild.js",
     "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test"
@@ -59,9 +59,11 @@
     "datauri": "^3.0.0",
     "elliptic": ">=6.5.3",
     "esbuild": "^0.8.17",
+    "glob": "^7.1.6",
     "http-server": "^0.12.3",
     "minimist": "^1.2.5",
     "mocha": "^8.2.1",
+    "msdf-bmfont-xml": "^2.5.4",
     "npm-watch": "^0.7.0"
   }
 }

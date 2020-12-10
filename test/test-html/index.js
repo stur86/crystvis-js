@@ -9,6 +9,7 @@ import chai from 'chai';
 import { Renderer } from '../../lib/render.js';
 import { Model } from '../../lib/model.js';
 import { CrystVis } from '../../lib/visualizer.js';
+import * as Primitives from '../../lib/primitives';
 import * as Graphics from '../../lib/graphics.js';
 import circle_sprite from '../../lib/assets/circle.png';
 
@@ -22,7 +23,7 @@ describe('Renderer tests', function() {
         renderer = new Renderer('#main-app', 640, 480);
     });
     it('should successfully create an atom', function() {
-        var a = new Graphics.AtomMesh([0,0,0], 0.5, 0xff0000);
+        var a = new Primitives.AtomMesh([0,0,0], 0.5, 0xff0000);
         renderer._addAtomBond(a);
         chai.expect(renderer._g._ab.children).to.include(a);
         renderer._removeAtomBond(a);
@@ -31,8 +32,8 @@ describe('Renderer tests', function() {
         var latt = new THREE.Matrix3();
         latt.set(10, 0, 0, 1, 8, 0, 0, 0, 9).transpose();
 
-        var box = new Graphics.BoxMesh(latt);
-        var ax = new Graphics.AxesMesh(latt);
+        var box = new Primitives.BoxMesh(latt);
+        var ax = new Primitives.AxesMesh(latt);
 
         renderer._addLattice(box);
         renderer._addLattice(ax);
@@ -43,7 +44,7 @@ describe('Renderer tests', function() {
         renderer._removeLattice(ax);
     });
     it('should successfully create a bond', function() {
-        var b = new Graphics.BondMesh([0,0,0], [1,0,0]);
+        var b = new Primitives.BondMesh([0,0,0], [1,0,0]);
 
         renderer._addAtomBond(b);
 
@@ -64,7 +65,7 @@ describe('Renderer tests', function() {
     });
     it('should successfully clear a scene', function() {
 
-        var a = new Graphics.AtomMesh([0,0,0], 0.5, 0xff0000);
+        var a = new Primitives.AtomMesh([0,0,0], 0.5, 0xff0000);
         renderer._addAtomBond(a);
 
         renderer.clear();
