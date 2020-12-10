@@ -44,13 +44,16 @@
   },
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
+    "buffer": "^6.0.3",
     "chroma-js": "^2.1.0",
     "crystcif-parse": ">=0.2.4",
     "isosurface": "^1.0.0",
     "jquery": "^3.5.1",
+    "load-bmfont": "^1.4.1",
     "lodash": "^4.17.20",
     "mathjs": "^8.0.1",
     "three": "^0.122.0",
+    "three-bmfont-text": "^3.0.1",
     "yargs-parser": "^20.2.4"
   },
   "devDependencies": {

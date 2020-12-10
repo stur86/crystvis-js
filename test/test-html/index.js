@@ -6,24 +6,48 @@ import * as THREE from 'three';
 import chroma from 'chroma-js';
 
 import chai from 'chai';
-import { Renderer } from '../../lib/render.js';
-import { Model } from '../../lib/model.js';
-import { CrystVis } from '../../lib/visualizer.js';
+import {
+    Renderer
+} from '../../lib/render.js';
+import {
+    Model
+} from '../../lib/model.js';
+import {
+    CrystVis
+} from '../../lib/visualizer.js';
 import * as Primitives from '../../lib/primitives';
 import * as Graphics from '../../lib/graphics.js';
 import circle_sprite from '../../lib/assets/circle.png';
+import {
+    RubikMedium
+} from '../../lib/assets/fonts';
 
-import { exampleFiles } from './examples.js';
+import {
+    exampleFiles
+} from './examples.js';
 
 var renderer;
 var visualizer;
+
+describe('Font tests', function() {
+
+    it('should successfully create a BitmapFont', function() {
+        chai.expect(RubikMedium.ready).to.equal(true);
+    });
+
+    it('should successfully create a geometry from said font', function() {
+
+        var geo = RubikMedium.getTextGeometry('Hello world');
+        console.log(geo);
+    });
+});
 
 describe('Renderer tests', function() {
     it('should successfully load a Renderer', function() {
         renderer = new Renderer('#main-app', 640, 480);
     });
     it('should successfully create an atom', function() {
-        var a = new Primitives.AtomMesh([0,0,0], 0.5, 0xff0000);
+        var a = new Primitives.AtomMesh([0, 0, 0], 0.5, 0xff0000);
         renderer._addAtomBond(a);
         chai.expect(renderer._g._ab.children).to.include(a);
         renderer._removeAtomBond(a);
@@ -44,7 +68,7 @@ describe('Renderer tests', function() {
         renderer._removeLattice(ax);
     });
     it('should successfully create a bond', function() {
-        var b = new Primitives.BondMesh([0,0,0], [1,0,0]);
+        var b = new Primitives.BondMesh([0, 0, 0], [1, 0, 0]);
 
         renderer._addAtomBond(b);
 
@@ -65,7 +89,7 @@ describe('Renderer tests', function() {
     });
     it('should successfully clear a scene', function() {
 
-        var a = new Primitives.AtomMesh([0,0,0], 0.5, 0xff0000);
+        var a = new Primitives.AtomMesh([0, 0, 0], 0.5, 0xff0000);
         renderer._addAtomBond(a);
 
         renderer.clear();
@@ -86,13 +110,13 @@ describe('Visualizer tests', function() {
 
     it('should load new models in the visualizer', function() {
 
-        var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz', 'xyz', [3,3,3]);
+        var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz', 'xyz', [3, 3, 3]);
         var m2 = visualizer.loadModels(exampleFiles['org.cif']);
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);
         var m5 = visualizer.loadModels(exampleFiles['ethanol.magres'], 'magres');
 
-        chai.expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'xyz', 'xyz_1']);
+        chai.expect(visualizer.model_list.sort()).to.deep.equal(['1501936', 'I', 'magres', 'xyz', 'xyz_1']);
     });
 
     it('should correctly visualize a model', function() {
@@ -106,7 +130,7 @@ describe('Visualizer tests', function() {
         visualizer.displayed.setColor(0xff0000);
         visualizer.displayed.setColor();
 
-        visualizer.displayed.setOpacity(0.4);        
+        visualizer.displayed.setOpacity(0.4);
         visualizer.displayed.setOpacity();
 
         visualizer.displayed.addLabels();
@@ -116,6 +140,16 @@ describe('Visualizer tests', function() {
             'shiftY': -1,
             'textColor': 0xff0000
         });
+
+        var geo = RubikMedium.getTextGeometry('Hello World!');
+        var mat = RubikMedium.getTextMaterial();
+        var text = new THREE.Mesh(geo, mat);
+        text.scale.set(0.1, -0.1, 0.1);
+
+
+        console.log(text);
+
+        visualizer._renderer._s.add(text);
 
     });
 
