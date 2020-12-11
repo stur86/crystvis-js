@@ -38,7 +38,6 @@ describe('Font tests', function() {
     it('should successfully create a geometry from said font', function() {
 
         var geo = RubikMedium.getTextGeometry('Hello world');
-        console.log(geo);
     });
 });
 
@@ -137,19 +136,9 @@ describe('Visualizer tests', function() {
         visualizer.displayed.addLabels(function(a, i) {
             return a.radius;
         }, 'radius', {
-            'shiftY': -1,
-            'textColor': 0xff0000
+            shift: [0.1,-0.03,0],
+            color: 0xff0000
         });
-
-        var geo = RubikMedium.getTextGeometry('Hello World!');
-        var mat = RubikMedium.getTextMaterial();
-        var text = new THREE.Mesh(geo, mat);
-        text.scale.set(0.1, -0.1, 0.1);
-
-
-        console.log(text);
-
-        visualizer._renderer._s.add(text);
 
     });
 
