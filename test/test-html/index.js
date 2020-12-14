@@ -16,7 +16,6 @@ import {
     CrystVis
 } from '../../lib/visualizer.js';
 import * as Primitives from '../../lib/primitives';
-import * as Graphics from '../../lib/graphics.js';
 import circle_sprite from '../../lib/assets/circle.png';
 import {
     RubikMedium
@@ -76,9 +75,11 @@ describe('Renderer tests', function() {
         renderer._removeAtomBond(b);
     });
     it('should successfully render sprites', function() {
-        var s = new Graphics.ImageSprite([0, 0, 0], circle_sprite);
+        var s = new Primitives.ImageSprite(circle_sprite, {
+            position: [0, 0, 0]
+        });
         renderer._addSprite(s);
-        var ts = new Graphics.LabelSprite('Hello world');
+        var ts = new Primitives.TextSprite('Hello world');
         renderer._addSprite(ts);
 
         chai.expect(renderer._g._sprites.children).to.include.members([s, ts]);
@@ -136,7 +137,7 @@ describe('Visualizer tests', function() {
         visualizer.displayed.addLabels(function(a, i) {
             return a.radius;
         }, 'radius', {
-            shift: [0.1,-0.03,0],
+            shift: [0.1, -0.03, 0],
             color: 0xff0000
         });
 
