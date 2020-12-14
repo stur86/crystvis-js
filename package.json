@@ -62,12 +62,13 @@
     "datauri": "^3.0.0",
     "elliptic": ">=6.5.3",
     "esbuild": "^0.8.17",
+    "eslint": "^7.15.0",
     "glob": "^7.1.6",
     "http-server": "^0.12.3",
+    "jpeg-js": ">=0.4.0",
     "minimist": "^1.2.5",
     "mocha": "^8.2.1",
     "msdf-bmfont-xml": "^2.5.4",
-    "jpeg-js": ">=0.4.0",
     "npm-watch": "^0.7.0"
   }
 }
