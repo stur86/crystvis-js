@@ -18,5 +18,11 @@ esbuild.build({
         '.fnt': 'dataurl',
         '.frag': 'text',
         '.vert': 'text'
-    }
+    },
+    target: [
+    'chrome58',
+    'firefox57',
+    'safari11',
+    'edge16',
+    ]
 });
