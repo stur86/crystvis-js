@@ -9,15 +9,19 @@
       "patterns": [
         "demo/main.js",
         "lib/*",
-        "lib/*/*"
-      ]
+        "lib/*/*",
+        "lib/*/*/*"
+      ],
+      "extensions": "js,json,vert,frag"
     },
     "build-html-test": {
       "patterns": [
         "test/test-html/index.js",
         "lib/*",
-        "lib/*/*"
-      ]
+        "lib/*/*",
+        "lib/*/*/*"
+      ],
+      "extensions": "js,json,vert,frag"
     }
   },
   "scripts": {

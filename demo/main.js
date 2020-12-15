@@ -1,11 +1,11 @@
 'use strict';
 
 const CrystVis = require('../lib/visualizer.js').CrystVis;
+const Primitives = require('../lib/primitives/index.js');
 
 var visualizer = new CrystVis('#main-app', 640, 480);
 visualizer.highlight_selected = true;
 
-visualizer.onAtomClick();
 
 window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
@@ -22,7 +22,6 @@ window.loadFile = function() {
         var loaded = visualizer.loadModels(reader.result, extension, name, [sx, sy, sz]);
         visualizer.displayModel(loaded[0]);
         visualizer.displayed = visualizer.model.find(['all']);
-        //visualizer.displayed = visualizer.model.find(['cell', [0,0,0]]);
     };
 }
 
