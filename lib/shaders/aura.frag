@@ -10,6 +10,7 @@ in vec2 vUv;
 out vec4 myOutputColor;
 
 void main() {
+  
   vec2 r = vUv-vec2(0.5, 0.5);
   float rnorm = sqrt(r.x*r.x+r.y*r.y)*2.0;
 
