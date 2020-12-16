@@ -6,6 +6,11 @@ const Primitives = require('../lib/primitives/index.js');
 var visualizer = new CrystVis('#main-app', 640, 480);
 visualizer.highlight_selected = true;
 
+visualizer._renderer.add(new Primitives.AtomMesh([0,0,0], 1.2, 0x00ffaa));
+visualizer._renderer.add(new Primitives.EllipsoidMesh({
+    eigenvalues: [1, 2, 3],
+    opacity: 0.3,
+}));
 
 window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
@@ -15,7 +20,7 @@ window.loadFile = function() {
     var sx = parseInt(document.getElementById("scell-x").value) || 1;
     var sy = parseInt(document.getElementById("scell-y").value) || 1;
     var sz = parseInt(document.getElementById("scell-z").value) || 1;
-    
+
     reader.readAsText(file);
     reader.onload = function() {
         var name = file.name.split('.')[0];
@@ -34,8 +39,7 @@ window.changeLabels = function() {
     var val = document.getElementById('label-check').checked;
     if (val) {
         visualizer.displayed.addLabels();
-    }
-    else {
+    } else {
         visualizer.displayed.removeLabels();
     }
 }
