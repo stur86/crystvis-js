@@ -8,7 +8,7 @@ visualizer.highlight_selected = true;
 
 visualizer._renderer.add(new Primitives.AtomMesh([0,0,0], 1.2, 0x00ffaa));
 visualizer._renderer.add(new Primitives.EllipsoidMesh({
-    eigenvalues: [1, 2, 3],
+    eigenvalues: [2.5, 2, 3],
     opacity: 0.3,
 }));
 
