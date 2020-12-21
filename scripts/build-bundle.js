@@ -10,7 +10,8 @@ esbuild.build({
     inject: [path.join(__dirname, 'plugins-shim.js')],   // Crude, but a necessary fix for load-bmfont
     define: {
         Buffer: 'Buffer',
-        THREE: 'THREE'
+        THREE: 'THREE',
+        BUILD_GRAPHICS: true
     },
     outfile: process.argv[3],
     loader: {
