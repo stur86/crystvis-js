@@ -95,5 +95,4 @@ describe('#tensordata', function() {
 
     });
 
-
 });

@@ -46,9 +46,9 @@ describe('Renderer tests', function() {
     });
     it('should successfully create an atom', function() {
         var a = new Primitives.AtomMesh([0, 0, 0], 0.5, 0xff0000);
-        renderer._addAtomBond(a);
-        chai.expect(renderer._g._ab.children).to.include(a);
-        renderer._removeAtomBond(a);
+        renderer.add(a, 'model');
+        chai.expect(renderer._groups.model.children).to.include(a);
+        renderer.remove(a, 'model');
     });
     it('should successfully create a unit cell', function() {
         var latt = new THREE.Matrix3();
@@ -57,40 +57,40 @@ describe('Renderer tests', function() {
         var box = new Primitives.BoxMesh(latt);
         var ax = new Primitives.AxesMesh(latt);
 
-        renderer._addLattice(box);
-        renderer._addLattice(ax);
+        renderer.add(box, 'model');
+        renderer.add(ax, 'model');
 
-        chai.expect(renderer._g._latt.children).to.include.members([box, ax]);
+        chai.expect(renderer._groups.model.children).to.include.members([box, ax]);
 
-        renderer._removeLattice(box);
-        renderer._removeLattice(ax);
+        renderer.remove(box, 'model');
+        renderer.remove(ax, 'model');
     });
     it('should successfully create a bond', function() {
         var b = new Primitives.BondMesh([0, 0, 0], [1, 0, 0]);
 
-        renderer._addAtomBond(b);
+        renderer.add(b, 'model');
 
-        chai.expect(renderer._g._ab.children).to.include(b);
+        chai.expect(renderer._groups.model.children).to.include(b);
 
-        renderer._removeAtomBond(b);
+        renderer.remove(b, 'model');
     });
     it('should successfully render sprites', function() {
         var s = new Primitives.ImageSprite(circle_sprite, {
             position: [0, 0, 0]
         });
-        renderer._addSprite(s);
+        renderer.add(s, 'primitives');
         var ts = new Primitives.TextSprite('Hello world');
-        renderer._addSprite(ts);
+        renderer.add(ts, 'primitives');
 
-        chai.expect(renderer._g._sprites.children).to.include.members([s, ts]);
+        chai.expect(renderer._groups.primitives.children).to.include.members([s, ts]);
 
-        renderer._removeSprite(s);
-        renderer._removeSprite(ts);
+        renderer.remove(s);
+        renderer.remove(ts);
     });
     it('should successfully clear a scene', function() {
 
         var a = new Primitives.AtomMesh([0, 0, 0], 0.5, 0xff0000);
-        renderer._addAtomBond(a);
+        renderer.add(a);
 
         renderer.clear();
 
@@ -140,6 +140,23 @@ describe('Visualizer tests', function() {
             shift: [0.1, -0.03, 0],
             color: 0xff0000
         });
+
+    });
+
+    it('should correctly add/remove ellipsoids to the displayed atoms', function() {
+
+        var data = {
+            eigenvalues: [1, 2, 4],
+            eigenvectors: [
+                [1, 1, 0],
+                [1, -1, 0],
+                [0, 0, 1]
+            ]
+        };
+
+        visualizer.displayed.atoms[0].addEllipsoid(data, 'test');
+        visualizer.displayed.atoms[1].addEllipsoid(data, 'test2', {color: 0x00ee88});
+        visualizer.displayed.atoms[0].removeEllipsoid('test');
 
     });
 
