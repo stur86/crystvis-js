@@ -6,15 +6,6 @@ const Primitives = require('../lib/primitives/index.js');
 var visualizer = new CrystVis('#main-app', 640, 480);
 visualizer.highlight_selected = true;
 
-visualizer._renderer.add(new Primitives.AtomMesh([0,0,0], 1.2, 0x00ffaa));
-visualizer._renderer.add(new Primitives.EllipsoidMesh({
-    eigenvalues: [6, 2, 3],
-    eigenvectors: [[1, -1, 0], 
-                   [1,  1, 0], 
-                   [0,  0, 1]],
-    opacity: 0.3,
-}));
-
 window.loadFile = function() {
     var file = document.getElementById('file-load').files[0];
     var reader = new FileReader();
@@ -44,5 +35,21 @@ window.changeLabels = function() {
         visualizer.displayed.addLabels();
     } else {
         visualizer.displayed.removeLabels();
+    }
+}
+
+window.changeEllipsoids = function() {
+    var val = document.getElementById('ellipsoid-check').checked;
+    if (val) {
+        visualizer.displayed.find(
+            ['elements', ['H']]
+            ).addEllipsoids((a) => {
+            return a.getArrayValue('ms');
+        }, 'ms', {
+            scalingFactor: 0.05,
+            opacity: 0.2
+        });
+    } else {
+        visualizer.displayed.removeEllipsoids('ms');
     }
 }
