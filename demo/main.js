@@ -20,7 +20,9 @@ window.loadFile = function() {
         var name = file.name.split('.')[0];
         var loaded = visualizer.loadModels(reader.result, extension, name, [sx, sy, sz]);
         visualizer.displayModel(loaded[0]);
-        visualizer.displayed = visualizer.model.find(['all']);
+        visualizer.displayed = visualizer.model.find({
+            'all': []
+        });
     };
 }
 
@@ -41,9 +43,9 @@ window.changeLabels = function() {
 window.changeEllipsoids = function() {
     var val = document.getElementById('ellipsoid-check').checked;
     if (val) {
-        visualizer.displayed.find(
-            ['elements', ['H']]
-            ).addEllipsoids((a) => {
+        visualizer.displayed.find({
+            'elements': 'H'
+        }).addEllipsoids((a) => {
             return a.getArrayValue('ms');
         }, 'ms', {
             scalingFactor: 0.05,

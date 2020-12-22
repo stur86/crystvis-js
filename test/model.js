@@ -7,17 +7,30 @@ import chaiAlmost from 'chai-almost'
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {
+    fileURLToPath
+} from 'url';
 
-import { Atoms as Atoms } from 'crystcif-parse';
-import { Model, AtomImage, BondImage } from '../lib/model.js';
-import { ModelView as ModelView } from '../lib/modelview.js';
-import { Loader as Loader } from '../lib/loader.js';
+import {
+    Atoms as Atoms
+} from 'crystcif-parse';
+import {
+    Model,
+    AtomImage,
+    BondImage
+} from '../lib/model.js';
+import {
+    ModelView as ModelView
+} from '../lib/modelview.js';
+import {
+    Loader as Loader
+} from '../lib/loader.js';
 
 chai.use(chaiAlmost(1e-3));
 
 const expect = chai.expect
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(
+    import.meta.url));
 
 // Load test files
 var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
@@ -81,7 +94,7 @@ describe('#atomimage', function() {
     it('should correctly identify the closest bonding neighbours', function() {
 
         // This one relies on Model to compute the right bonds
-        
+
         var atoms = h2omodel.atoms;
         var a = atoms[0];
 
@@ -102,8 +115,8 @@ describe('#atomimage', function() {
 describe('#bondimage', function() {
     it('should correctly compute the distance between atoms in the bond', function() {
 
-        var a1 = new AtomImage(h2omodel, 0, [0,0,0]);
-        var a2 = new AtomImage(h2omodel, 1, [0,0,0]);
+        var a1 = new AtomImage(h2omodel, 0, [0, 0, 0]);
+        var a2 = new AtomImage(h2omodel, 1, [0, 0, 0]);
 
         var b = new BondImage(h2omodel, a1, a2);
 
@@ -185,13 +198,19 @@ describe('#model', function() {
         expect(found).to.deep.equal([3]);
 
         // Test a more complex query
-        found = simodel3.find(['$and', ['box', [0, 0, 0],
-                [2, 2, 2]
-            ],
-            ['box', [1, 1, 1],
-                [3, 3, 3]
-            ],
-        ]);
+        found = simodel3.find({
+            '$and': [{
+                'box': [
+                    [0, 0, 0],
+                    [2, 2, 2]
+                ]
+            }, {
+                'box': [
+                    [1, 1, 1],
+                    [3, 3, 3]
+                ]
+            }]
+        });
 
         expect(found.length).to.equal(1);
         expect(found.atoms[0].index).to.equal(1);
@@ -213,7 +232,7 @@ describe('#model', function() {
         ]);
         expect(bonds[3][5]).to.deep.equal([
             [0, -1, -1]
-        ]);        
+        ]);
 
     });
 
@@ -228,17 +247,31 @@ describe('#modelview', function() {
 
     it('should correctly AND two successive queries', function() {
 
-        var mv1 = h2omodel.find(['cell', [0, 0, 0]]);
-        var mv2 = mv1.find(['elements', 'O']);
+        var mv1 = h2omodel.find({
+            'cell': [
+                [0, 0, 0]
+            ]
+        });
+        var mv2 = mv1.find({
+            'elements': 'O'
+        });
         expect(mv2.indices).to.deep.equal([0, 3]);
 
     });
 
     it('should correctly perform boolean operations between views', function() {
 
-        var mv1 = h2omodel.find(['elements', 'O']);
-        var mv2 = h2omodel.find(['elements', 'H']);
-        var mv3 = h2omodel.find(['sphere', [0, 0, 0], 1]);
+        var mv1 = h2omodel.find({
+            'elements': 'O'
+        });
+        var mv2 = h2omodel.find({
+            'elements': 'H'
+        });
+        var mv3 = h2omodel.find({
+            'sphere': [
+                [0, 0, 0], 1
+            ]
+        });
 
         var mvAnd = mv1.and(mv2);
         expect(mvAnd.length).to.equal(0);
@@ -253,11 +286,13 @@ describe('#modelview', function() {
         expect(mvNot.indices.sort()).to.deep.equal([3, 4, 5]);
 
         // Throw exception
-        var mvSi = simodel.find(['all']);
+        var mvSi = simodel.find({
+            'all': []
+        });
 
         expect(function() {
             mv1.and(mvSi);
-        }).to.throw('The two ModelViews do not refer to the same Model');       
+        }).to.throw('The two ModelViews do not refer to the same Model');
 
     });
 
