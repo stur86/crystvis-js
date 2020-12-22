@@ -1,5 +1,5 @@
 uniform vec3 color;
-uniform float alpha;
+uniform float opacity;
 uniform float illum;
 uniform vec2 shift;
 uniform float ditherN;
@@ -25,7 +25,7 @@ void main() {
    float iN = mod(ditherCoords.x+shift.x, ditherN)/ditherN;
    float jN = mod(ditherCoords.y+shift.y, ditherN)/ditherN;
    vec4 ditherCol = texture2D(ditherTex, vec2(iN, jN));
-   if (ditherCol.r > alpha)
+   if (ditherCol.r > opacity)
        discard;
 // Lighting is also handled very simply, just a fraction of front illumination + ambient light.
 // This mostly because for some reason I cant get it to work with proper lighting (possibly a bug in THREE.js).

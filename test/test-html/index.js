@@ -158,6 +158,26 @@ describe('Visualizer tests', function() {
         visualizer.displayed.atoms[1].addEllipsoid(data, 'test2', {color: 0x00ee88});
         visualizer.displayed.atoms[0].removeEllipsoid('test');
 
+        // Set their properties
+        visualizer.displayed.atoms[1].ellipsoidProperty('test2', 'color', 0x8800ee);
+
+    });
+
+    it('should correctly draw simple primitives', function() {
+
+        var a1 = visualizer.displayed.atoms[0];
+        var a2 = visualizer.displayed.atoms[1];
+        var a3 = visualizer.displayed.atoms[2];
+        var line1 = new Primitives.LineMesh(a1, a2);
+        var line2 = new Primitives.LineMesh(a2, a3, {
+            color: 0xff9900,
+            dashed: true,
+        });
+
+        visualizer.addPrimitive(line1);
+        visualizer.addPrimitive(line2);
+        visualizer.removePrimitive(line1);
+
     });
 
 });

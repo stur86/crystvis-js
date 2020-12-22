@@ -51,6 +51,7 @@ window.changeEllipsoids = function() {
             scalingFactor: 0.05,
             opacity: 0.2
         });
+
     } else {
         visualizer.displayed.removeEllipsoids('ms');
     }
