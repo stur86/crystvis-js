@@ -110,7 +110,9 @@ describe('Visualizer tests', function() {
 
     it('should load new models in the visualizer', function() {
 
-        var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz', 'xyz', [3, 3, 3]);
+        var m1 = visualizer.loadModels(exampleFiles['H2O.xyz'], 'xyz', 'xyz', {
+            supercell: [3, 3, 3]
+        });
         var m2 = visualizer.loadModels(exampleFiles['org.cif']);
         var m3 = visualizer.loadModels(exampleFiles['si8.xyz'], 'xyz');
         var m4 = visualizer.loadModels(exampleFiles['example_single.cif']);
@@ -155,7 +157,9 @@ describe('Visualizer tests', function() {
         };
 
         visualizer.displayed.atoms[0].addEllipsoid(data, 'test');
-        visualizer.displayed.atoms[1].addEllipsoid(data, 'test2', {color: 0x00ee88});
+        visualizer.displayed.atoms[1].addEllipsoid(data, 'test2', {
+            color: 0x00ee88
+        });
         visualizer.displayed.atoms[0].removeEllipsoid('test');
 
         // Set their properties

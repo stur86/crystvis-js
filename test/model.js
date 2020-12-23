@@ -36,7 +36,9 @@ const __dirname = path.dirname(fileURLToPath(
 var cif = fs.readFileSync(path.join(__dirname, 'data', 'CHA.cif'), "utf8");
 var cha = Atoms.readCif(cif)['CHA'];
 var chamodel = new Model(cha);
-var chamodel3 = new Model(cha, [3, 3, 3]);
+var chamodel3 = new Model(cha, {
+    supercell: [3, 3, 3]
+});
 
 cif = fs.readFileSync(path.join(__dirname, 'data', 'org.cif'), "utf8");
 var org = Atoms.readCif(cif)['1501936'];
@@ -50,7 +52,9 @@ var pyrmodel = new Model(pyr);
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
 var si = loader.loadXYZ(xyz);
 var simodel = new Model(si);
-var simodel3 = new Model(si, [3, 3, 3]);
+var simodel3 = new Model(si, {
+    supercell: [3, 3, 3]
+});
 
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'H2O.xyz'), "utf8");
 var h2o = loader.loadXYZ(xyz);
@@ -239,6 +243,24 @@ describe('#model', function() {
     it('should identify the right molecules', function() {
 
         expect(h2omodel._molinds).to.deep.equal([0, 0, 0, 1, 1, 1]);
+
+    });
+
+    it('should correctly load a model as molecular crystal', function() {
+
+        var h2omolcryst = new Model(h2o, {
+            molecularCrystal: true
+        });
+
+        for (let i = 0; i < h2omolcryst._molecules.length; ++i) {
+            let mol = h2omolcryst._molecules[i];
+            for (let j = 0; j < mol.length; ++j) {
+                expect(mol[j].cell).to.deep.equal([0, 0, 0]);
+            }
+        }
+
+        // Check that it didn't alter the original Atoms object
+        expect(h2omolcryst.positions).to.not.deep.equal(h2omodel.positions);
 
     });
 });

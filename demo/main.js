@@ -17,8 +17,12 @@ window.loadFile = function() {
 
     reader.readAsText(file);
     reader.onload = function() {
+        var mcryst = document.getElementById('molcryst-check').checked;
         var name = file.name.split('.')[0];
-        var loaded = visualizer.loadModels(reader.result, extension, name, [sx, sy, sz]);
+        var loaded = visualizer.loadModels(reader.result, extension, name, {
+            supercell: [sx, sy, sz],
+            molecularCrystal: mcryst
+        });
         visualizer.displayModel(loaded[0]);
         visualizer.displayed = visualizer.model.find({
             'all': []
