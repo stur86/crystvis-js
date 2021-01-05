@@ -129,11 +129,11 @@ describe('Visualizer tests', function() {
 
     it('should correctly apply changes in properties to the displayed atoms', function() {
 
-        visualizer.displayed.setColor(0xff0000);
-        visualizer.displayed.setColor();
+        visualizer.displayed.setProperty('color', 0xff0000);
+        visualizer.displayed.setProperty('color');
 
-        visualizer.displayed.setOpacity(0.4);
-        visualizer.displayed.setOpacity();
+        visualizer.displayed.setProperty('opacity', 0.4);
+        visualizer.displayed.setProperty('opacity');
 
         visualizer.displayed.addLabels();
         visualizer.displayed.addLabels(function(a, i) {
