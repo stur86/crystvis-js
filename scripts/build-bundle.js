@@ -11,15 +11,8 @@ esbuild.build({
     define: {
         Buffer: 'Buffer',
         THREE: 'THREE',
-        BUILD_GRAPHICS: true
     },
     outfile: process.argv[3],
-    loader: {
-        '.png': 'dataurl',
-        '.fnt': 'dataurl',
-        '.frag': 'text',
-        '.vert': 'text'
-    },
     target: [
     'chrome58',
     'firefox57',

@@ -16,7 +16,6 @@ import {
     CrystVis
 } from '../../lib/visualizer.js';
 import * as Primitives from '../../lib/primitives';
-import circle_sprite from '../../lib/assets/circle.png';
 import {
     RubikMedium
 } from '../../lib/assets/fonts';
@@ -75,16 +74,11 @@ describe('Renderer tests', function() {
         renderer.remove(b, 'model');
     });
     it('should successfully render sprites', function() {
-        var s = new Primitives.ImageSprite(circle_sprite, {
-            position: [0, 0, 0]
-        });
-        renderer.add(s, 'primitives');
         var ts = new Primitives.TextSprite('Hello world');
         renderer.add(ts, 'primitives');
 
-        chai.expect(renderer._groups.primitives.children).to.include.members([s, ts]);
+        chai.expect(renderer._groups.primitives.children).to.include.members([ts]);
 
-        renderer.remove(s);
         renderer.remove(ts);
     });
     it('should successfully clear a scene', function() {

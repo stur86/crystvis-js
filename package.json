@@ -12,7 +12,7 @@
         "lib/*/*",
         "lib/*/*/*"
       ],
-      "extensions": "js,json,vert,frag"
+      "extensions": "js,json"
     },
     "build-html-test": {
       "patterns": [
@@ -21,15 +21,24 @@
         "lib/*/*",
         "lib/*/*/*"
       ],
-      "extensions": "js,json,vert,frag"
+      "extensions": "js,json"
+    },
+    "build-resources": {
+      "patterns": [
+        "lib/assets/fonts/*",
+        "lib/shaders/*"
+      ],
+      "extensions": "png,fnt,vert,frag"
     }
   },
   "scripts": {
     "test": "mocha --reporter spec",
+    "prepare": "npm run build-resources",
     "build-fonts": "node scripts/build-fonts.js",
     "build-demo": "node scripts/build-bundle.js demo/main.js demo/demo.js",
+    "build-resources": "node scripts/build-resources.js",
     "build-html-test": "node scripts/build-bundle.js test/test-html/index.js test/test-html/testbuild.js",
-    "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test"
+    "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test & npm-watch build-resources"
   },
   "repository": {
     "type": "git",
