@@ -7,11 +7,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 esbuild.build({
     entryPoints: [process.argv[2]],
     bundle: true,
-    inject: [path.join(__dirname, 'plugins-shim.js')],   // Crude, but a necessary fix for load-bmfont
-    define: {
-        Buffer: 'Buffer',
-        THREE: 'THREE',
-    },
     outfile: process.argv[3],
     target: [
     'chrome58',

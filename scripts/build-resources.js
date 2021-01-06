@@ -29,3 +29,17 @@ toBuild.forEach((inputFile) => {
         }
     });
 });
+
+// // A special treatment for fonts.js. Needs some definitions injected
+// esbuild.build({
+//     entryPoints: [path.join(__dirname, '../lib/assets/fonts/threebmfont.in.js')],
+//     bundle: true,
+//     inject: [path.join(__dirname, 'plugins-shim.js')],   // Crude, but a necessary fix for load-bmfont
+//     define: {
+//         Buffer: 'Buffer',
+//         THREE: 'THREE',
+//     },
+//     platform: 'node',
+//     outfile: path.join(__dirname, '../lib/assets/fonts/threebmfont.js')    
+// });
+
