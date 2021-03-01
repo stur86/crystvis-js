@@ -65,7 +65,7 @@
     "load-bmfont": "^1.4.1",
     "lodash": "^4.17.20",
     "mathjs": "^8.0.1",
-    "three": "^0.122.0",
+    "three": "^0.125.0",
     "@stur86/three-bmfont-text": "^3.0.2",
     "yargs-parser": "^20.2.4"
   },
