@@ -74,7 +74,7 @@
     "chai": "^4.2.0",
     "chai-almost": "^1.0.1",
     "datauri": "^3.0.0",
-    "elliptic": ">=6.5.3",
+    "elliptic": ">=6.5.4",
     "esbuild": "^0.8.17",
     "eslint": "^7.15.0",
     "glob": "^7.1.6",
