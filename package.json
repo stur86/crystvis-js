@@ -57,7 +57,7 @@
   },
   "homepage": "https://github.com/stur86/crystvis-js#readme",
   "dependencies": {
-    "@stur86/three-bmfont-text": "^3.0.2",
+    "@stur86/three-bmfont-text": "^3.0.3",
     "buffer": "^6.0.3",
     "chroma-js": "^2.1.0",
     "crystcif-parse": ">=0.2.4",
