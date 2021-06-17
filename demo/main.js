@@ -60,3 +60,40 @@ window.changeEllipsoids = function() {
         visualizer.displayed.removeEllipsoids('ms');
     }
 }
+
+var isosurface = null;
+window.changeIsosurface = function() {
+    var val = document.getElementById('isosurf-check').checked;
+
+    // Create the data
+    var field = [];
+    for (let x = 0; x < 15; x += 1) {
+        field.push([]);
+        for (let y = 0; y < 15; y += 1) {
+            field[x].push([]);
+            for (let z = 0; z < 15; z += 1) {
+                var r = Math.pow(x-8, 2);
+                r += Math.pow(y-8, 2);
+                r += Math.pow(z-8, 2);
+                r = Math.sqrt(r);
+                field[x][y].push(r);
+            }
+        }
+    }
+
+
+    if (val) {
+        var cell =  visualizer.model.cell;
+        isosurface = new Primitives.IsosurfaceMesh(field, 6.0, cell, 
+            {
+                opacityMode: Primitives.IsosurfaceMesh.RENDER_WFRAME,
+                isoMethod: Primitives.IsosurfaceMesh.ISO_SURFACE_NETS
+            });
+        visualizer.addPrimitive(isosurface);
+    } else {
+        if (isosurface) {
+            visualizer.removePrimitive(isosurface);
+        }
+    }
+
+}
