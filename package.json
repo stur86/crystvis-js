@@ -38,7 +38,7 @@
     "build-demo": "node scripts/build-bundle.js demo/main.js demo/demo.js",
     "build-resources": "node scripts/build-resources.js",
     "build-html-test": "node scripts/build-bundle.js test/test-html/index.js test/test-html/testbuild.js",
-    "watch-testserver": "http-server . & npm-watch build-demo & npm-watch build-html-test & npm-watch build-resources"
+    "watch-testserver": "npx serve & npm-watch build-demo & npm-watch build-html-test & npm-watch build-resources"
   },
   "repository": {
     "type": "git",
@@ -78,11 +78,11 @@
     "esbuild": "^0.8.17",
     "eslint": "^7.15.0",
     "glob": "^7.1.6",
-    "http-server": "^0.12.3",
     "jpeg-js": ">=0.4.0",
     "minimist": "^1.2.5",
     "mocha": "^8.2.1",
     "msdf-bmfont-xml": "^2.5.4",
-    "npm-watch": "^0.7.0"
+    "npm-watch": "^0.7.0",
+    "serve": "^12.0.0"
   }
 }
