@@ -12,6 +12,6 @@ esbuild.build({
     'chrome58',
     'firefox57',
     'safari11',
-    'edge16',
+    'edge18',
     ]
 });

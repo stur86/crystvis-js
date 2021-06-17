@@ -20,6 +20,7 @@ toBuild.forEach((inputFile) => {
         entryPoints: [path.join(__dirname, inputFile)],
         bundle: true,
         platform: 'node',
+        format: 'esm',
         outfile: path.join(__dirname, outputFile),
         loader: {
             '.png': 'dataurl',
