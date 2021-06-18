@@ -7,3 +7,5 @@ import {
 export {
     CrystVis
 }
+
+export default CrystVis;
