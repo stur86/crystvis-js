@@ -60,7 +60,7 @@
     "@stur86/three-bmfont-text": "^3.0.3",
     "buffer": "^6.0.3",
     "chroma-js": "^2.1.0",
-    "crystcif-parse": ">=0.2.4",
+    "crystcif-parse": ">=0.2.6",
     "isosurface": "^1.0.0",
     "jquery": "^3.5.1",
     "load-bmfont": "^1.4.1",

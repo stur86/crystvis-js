@@ -85,4 +85,23 @@ describe('#loading', function() {
         expect(loader.error_message).to.equal('Invalid Magres file format: block opened without closing');
 
     });
+    it('should load properly a CELL file', function() {
+
+        var loader = new Loader();
+
+        var cell = fs.readFileSync(path.join(__dirname, 'data', 'ethanol.cell'), "utf8");
+        var a = loader.load(cell, 'cell')['cell'];
+
+        expect(a.get_cell()).to.almost.deep.equal([[6,0,0],[0,6,0],[0,0,6]]);
+        expect(a.get_chemical_symbols()).to.deep.equal(['H', 'H', 'H', 'H', 'H', 'H', 'C', 'C', 'O']);
+        expect(a.get_positions()[0]).to.almost.deep.equal([2.129659, 2.823711, 2.349943]);
+        
+        // Test an example with ABC lattice and FRAC positions
+        cell = fs.readFileSync(path.join(__dirname, 'data', 'frac.cell'), "utf8");
+        a = loader.load(cell, 'cell')['cell'];
+
+        expect(a.get_cell()).to.almost.deep.equal([[10.0, 0, 0], [10.0, 10.0, 0], [0, 0, 10.0]]);
+        expect(a.get_positions()[0]).to.almost.deep.equal([10.0, 5.0, 5.0]);
+
+    });
 });
