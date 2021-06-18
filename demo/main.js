@@ -23,7 +23,7 @@ window.loadFile = function() {
             supercell: [sx, sy, sz],
             molecularCrystal: mcryst
         });
-        visualizer.displayModel(loaded[0]);
+        visualizer.displayModel(Object.keys(loaded)[0]);
         visualizer.displayed = visualizer.model.find({
             'all': []
         });
@@ -67,16 +67,17 @@ window.changeIsosurface = function() {
 
     // Create the data
     var field = [];
-    for (let x = 0; x < 15; x += 1) {
+    for (let x = 0; x < 30; x += 1) {
         field.push([]);
-        for (let y = 0; y < 15; y += 1) {
+        for (let y = 0; y < 30; y += 1) {
             field[x].push([]);
-            for (let z = 0; z < 15; z += 1) {
-                var r = Math.pow(x-8, 2);
-                r += Math.pow(y-8, 2);
-                r += Math.pow(z-8, 2);
+            for (let z = 0; z < 30; z += 1) {
+                var r = Math.pow(x-15, 2);
+                r += Math.pow(y-15, 2);
+                r += Math.pow(z-15, 2);
                 r = Math.sqrt(r);
-                field[x][y].push(r);
+                var phi = Math.acos((z-15)/r);
+                field[x][y].push(r-Math.cos(3*phi)*0.2);
             }
         }
     }
@@ -84,12 +85,13 @@ window.changeIsosurface = function() {
 
     if (val) {
         var cell =  visualizer.model.cell;
-        isosurface = new Primitives.IsosurfaceMesh(field, 6.0, cell, 
+        isosurface = new Primitives.IsosurfaceMesh(field, 7.0, cell, 
             {
                 opacityMode: Primitives.IsosurfaceMesh.RENDER_WFRAME,
                 isoMethod: Primitives.IsosurfaceMesh.ISO_SURFACE_NETS
             });
         visualizer.addPrimitive(isosurface);
+        isosurface.color = '#ff0000';
     } else {
         if (isosurface) {
             visualizer.removePrimitive(isosurface);

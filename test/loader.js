@@ -21,7 +21,7 @@ describe('#loading', function() {
         var loader = new Loader();
 
         var xyz = fs.readFileSync(path.join(__dirname, 'data', 'pyridine.xyz'), "utf8");
-        var a = loader.loadXYZ(xyz);
+        var a = loader.load(xyz, 'xyz')['xyz'];
 
         expect(a.get_chemical_symbols()).to.deep.equal(['C', 'C', 'C', 'N', 'C', 'C',
             'H', 'H', 'H', 'H', 'H'
@@ -32,7 +32,7 @@ describe('#loading', function() {
         var loader = new Loader();
 
         var xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
-        var a = loader.loadXYZ(xyz);
+        var a = loader.load(xyz, 'xyz')['xyz'];
 
         expect(a.get_cell()).to.deep.almost.equal([
             [5.44, 0, 0],
@@ -46,7 +46,7 @@ describe('#loading', function() {
         var loader = new Loader();
 
         var cif = fs.readFileSync(path.join(__dirname, 'data', 'org.cif'), "utf8");
-        var a = loader.loadCIF(cif)['1501936'];
+        var a = loader.load(cif)['1501936'];
 
 
         chai.expect(a.get_cell()).to.deep.almost.equal([
@@ -60,7 +60,7 @@ describe('#loading', function() {
         var loader = new Loader();
 
         var magres = fs.readFileSync(path.join(__dirname, 'data', 'ethanol.magres'), "utf8");
-        var a = loader.loadMagres(magres);
+        var a = loader.load(magres, 'magres')['magres'];
 
         expect(loader.status).to.equal(Loader.STATUS_SUCCESS);
         expect(a.length()).to.equal(9);
@@ -78,10 +78,10 @@ describe('#loading', function() {
         expect(a.info['magres-version']).to.equal('1.0');
 
         // Test for failure
-        loader.loadMagres('Something');
+        loader.load('Something', 'magres');
         expect(loader.error_message).to.equal('Invalid Magres file format: no version line');
 
-        loader.loadMagres('#$magres-abinitio-v1.0\n[block]\n[another]');
+        loader.load('#$magres-abinitio-v1.0\n[block]\n[another]', 'magres');
         expect(loader.error_message).to.equal('Invalid Magres file format: block opened without closing');
 
     });

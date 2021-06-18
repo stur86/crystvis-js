@@ -46,18 +46,18 @@ var orgmodel = new Model(org);
 
 var xyz = fs.readFileSync(path.join(__dirname, 'data', 'pyridine.xyz'), "utf8");
 var loader = new Loader();
-var pyr = loader.loadXYZ(xyz);
+var pyr = loader.load(xyz, 'xyz')['xyz'];
 var pyrmodel = new Model(pyr);
 
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'si8.xyz'), "utf8");
-var si = loader.loadXYZ(xyz);
+var si = loader.load(xyz, 'xyz')['xyz'];
 var simodel = new Model(si);
 var simodel3 = new Model(si, {
     supercell: [3, 3, 3]
 });
 
 xyz = fs.readFileSync(path.join(__dirname, 'data', 'H2O.xyz'), "utf8");
-var h2o = loader.loadXYZ(xyz);
+var h2o = loader.load(xyz, 'xyz')['xyz'];
 var h2omodel = new Model(h2o);
 
 describe('#atomimage', function() {
