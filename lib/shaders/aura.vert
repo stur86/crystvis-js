@@ -1,4 +1,3 @@
-#version 300 es
 
 in vec2 uv;
 in vec4 position;

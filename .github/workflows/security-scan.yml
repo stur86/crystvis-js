@@ -1,0 +1,113 @@
+name: Security Scan
+
+on:
+  schedule:
+    # Run every day at midnight
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      issues: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        id: audit
+        run: |
+          npm audit --json > audit-results.json || true
+          npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Parse audit results
+        id: parse
+        run: |
+          if [ -f audit-results.json ]; then
+            VULNERABILITIES=$(jq '.metadata.vulnerabilities | to_entries | map("\(.key): \(.value)") | join(", ")' audit-results.json)
+            echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue for vulnerabilities
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let auditData = {};
+            try {
+              auditData = JSON.parse(fs.readFileSync('audit-results.json', 'utf8'));
+            } catch (e) {
+              console.log('Could not parse audit results');
+            }
+            
+            const title = '🔒 Security vulnerabilities detected';
+            const body = `## Security Audit Alert
+            
+            Security vulnerabilities have been detected in the project dependencies.
+            
+            ### Summary
+            ${auditData.metadata ? JSON.stringify(auditData.metadata.vulnerabilities, null, 2) : 'See workflow logs for details'}
+            
+            ### Action Required
+            1. Review the security advisory
+            2. Update affected packages
+            3. Run tests to ensure compatibility
+            4. Deploy fix as soon as possible
+            
+            ### Workflow Run
+            [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ---
+            *This issue was automatically created by the Security Scan workflow.*
+            `;
+            
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'security'
+            });
+            
+            const existingIssue = issues.data.find(issue => issue.title === title);
+            
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['security', 'dependencies']
+              });
+            }
+
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-results
+          path: audit-results.json
+          retention-days: 30

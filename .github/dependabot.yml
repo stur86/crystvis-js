@@ -1,0 +1,69 @@
+version: 2
+updates:
+  # Enable npm dependency updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    # Group updates by type (non-overlapping)
+    groups:
+      # Group all patch updates together
+      patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      # Group production dependency minor updates
+      production-minor:
+        patterns:
+          - "*"
+        dependency-type: "production"
+        update-types:
+          - "minor"
+      # Group development dependency minor updates
+      development-minor:
+        patterns:
+          - "*"
+        dependency-type: "development"
+        update-types:
+          - "minor"
+    # Customize PR settings
+    open-pull-requests-limit: 5
+    reviewers:
+      - "jkshenton"
+    assignees:
+      - "jkshenton"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Version strategy
+    versioning-strategy: auto
+    # Allow specific updates
+    allow:
+      - dependency-type: "all"
+    # Ignore major version updates for critical packages
+    # (handle these manually with thorough testing)
+    ignore:
+      - dependency-name: "three"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "mathjs"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "jquery"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "esbuild"
+        update-types: ["version-update:semver-major"]
+
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "github-actions"

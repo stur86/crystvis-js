@@ -1,0 +1,24 @@
+## Security Audit
+# npm audit report
+
+diff  6.0.0 - 8.0.2
+jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch - https://github.com/advisories/GHSA-73rr-hh4g-fpgx
+fix available via `npm audit fix --force`
+Will install mocha@11.3.0, which is a breaking change
+node_modules/diff
+  mocha  8.0.0 - 12.0.0-beta-3
+  Depends on vulnerable versions of diff
+  Depends on vulnerable versions of serialize-javascript
+  node_modules/mocha
+
+serialize-javascript  <=7.0.2
+Severity: high
+Serialize JavaScript is Vulnerable to RCE via RegExp.flags and Date.prototype.toISOString() - https://github.com/advisories/GHSA-5c6j-r48x-rmvq
+fix available via `npm audit fix --force`
+Will install mocha@11.3.0, which is a breaking change
+node_modules/serialize-javascript
+
+3 vulnerabilities (1 low, 2 high)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

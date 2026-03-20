@@ -1,5 +1,5 @@
 11
-Pyridine molecule (source: Wikipedia)
+Lattice="10 0 0 0 10 0 0 0 10" Properties=species:S:1:pos:R:3 pbc="T T T" Label="Pyridine molecule (source: Wikipedia)"
 C       -0.180226841      0.360945118     -1.120304970
 C       -0.180226841      1.559292118     -0.407860970
 C       -0.180226841      1.503191118      0.986935030

@@ -1,0 +1,61 @@
+#$magres-abinitio-v1.0
+# Synthetic magres file for testing HF tensor parsing from magres_old block
+[calculation]
+calc_code CASTEP
+calc_code_version 25.1
+[/calculation]
+[atoms]
+units lattice Angstrom
+lattice          1.0000000000000000E+01          0.0000000000000000E+00          0.0000000000000000E+00          0.0000000000000000E+00          1.0000000000000000E+01          0.0000000000000000E+00          0.0000000000000000E+00          0.0000000000000000E+00          1.0000000000000000E+01
+units atom Angstrom
+atom H       H   1          1.0000000000000000E+00          2.0000000000000000E+00          3.0000000000000000E+00
+atom C       C   1          4.0000000000000000E+00          5.0000000000000000E+00          6.0000000000000000E+00
+[/atoms]
+[magres]
+[/magres]
+[magres_old]
+==========================================================================
+  Using the following values of the magnetogyric ratio
+  H      Isotope   1             GAMMA =  2.6752E+08 rad T-1 s-1
+  C      Isotope  13             GAMMA =  6.7283E+07 rad T-1 s-1
+==========================================================================
+
+============
+Atom: H        1
+============
+H        1 Coordinates      1.000    2.000    3.000   A
+
+TOTAL tensor
+
+               1.2345     -0.5678      0.1234
+              -0.5678      2.3456      0.4567
+               0.1234      0.4567      3.4567
+
+H        1 Eigenvalue  A_xx       0.9985
+H        1 Eigenvector A_xx       0.9730      0.2304     -0.0220
+H        1 Eigenvalue  A_yy       2.4022
+H        1 Eigenvector A_yy      -0.2282      0.9623      0.1486
+H        1 Eigenvalue  A_zz       3.6361
+H        1 Eigenvector A_zz       0.0530     -0.1432      0.9884
+
+H        1 Iso:        2.3456 (MHz)
+============
+Atom: C        1
+============
+C        1 Coordinates      4.000    5.000    6.000   A
+
+TOTAL tensor
+
+               5.0000      1.0000      0.0000
+               1.0000      5.0000      0.0000
+               0.0000      0.0000      3.0000
+
+C        1 Eigenvalue  A_xx       3.0000
+C        1 Eigenvector A_xx       0.0000      0.0000      1.0000
+C        1 Eigenvalue  A_yy       4.0000
+C        1 Eigenvector A_yy      -0.7071      0.7071      0.0000
+C        1 Eigenvalue  A_zz       6.0000
+C        1 Eigenvector A_zz       0.7071      0.7071      0.0000
+
+C        1 Iso:        4.3333 (MHz)
+[/magres_old]

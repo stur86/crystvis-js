@@ -13,5 +13,9 @@ esbuild.build({
     'firefox57',
     'safari11',
     'edge18',
-    ]
-});
+    ],
+    define: {
+        'global': 'globalThis',
+    },
+    inject: [path.join(__dirname, 'plugins-shim.js')],
+}).catch(() => process.exit(1));

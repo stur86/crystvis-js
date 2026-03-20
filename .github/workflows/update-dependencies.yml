@@ -1,0 +1,214 @@
+name: Update Dependencies
+
+on:
+  # Run every Monday at 9 AM UTC
+  schedule:
+    - cron: '0 9 * * 1'
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      update_type:
+        description: 'Update type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - all
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          echo "## Outdated Packages" > outdated.txt
+          npm outdated || true
+          npm outdated > outdated.txt 2>&1 || true
+          cat outdated.txt
+
+      - name: Update dependencies (patch only)
+        if: github.event.inputs.update_type == 'patch' || github.event.inputs.update_type == ''
+        run: |
+          echo "Updating patch versions only..."
+          npm update --save
+
+      - name: Update dependencies (minor)
+        if: github.event.inputs.update_type == 'minor'
+        run: |
+          echo "Updating to latest minor versions..."
+          npx npm-check-updates -u --target minor
+          npm install
+
+      - name: Update dependencies (all)
+        if: github.event.inputs.update_type == 'all'
+        run: |
+          echo "Updating to latest versions (including major)..."
+          npx npm-check-updates -u
+          npm install
+
+      - name: Run security audit
+        id: audit
+        run: |
+          echo "## Security Audit" > audit.txt
+          npm audit --audit-level=moderate >> audit.txt 2>&1 || true
+          cat audit.txt
+        continue-on-error: true
+
+      - name: Build project
+        run: |
+          npm run build-resources
+          npm run build-demo
+          npm run build-html-test
+
+      - name: Run tests
+        id: tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet package.json package-lock.json; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No dependency updates available"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Dependencies have been updated"
+          fi
+
+      - name: Get updated packages
+        if: steps.changes.outputs.has_changes == 'true'
+        id: packages
+        run: |
+          # Create a summary of changes
+          echo "## Updated Packages" > changes.txt
+          git diff package.json | grep '"' | grep -E '^\+|^\-' >> changes.txt || echo "See package.json diff for details" >> changes.txt
+          cat changes.txt
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            deps: update dependencies $(date +%Y-%m-%d)
+            
+            Automated dependency update
+            Update type: ${{ github.event.inputs.update_type || 'patch' }}
+          branch: deps/automated-update-${{ github.run_number }}
+          delete-branch: true
+          title: 'deps: update dependencies $(date +%Y-%m-%d)'
+          body: |
+            ## Automated Dependency Update
+            
+            **Update Type:** `${{ github.event.inputs.update_type || 'patch' }}`
+            **Date:** $(date +%Y-%m-%d)
+            
+            ### Changes
+            This PR updates dependencies to their latest compatible versions.
+            
+            ### Test Results
+            - Build: ✅ Successful
+            - Tests: ${{ steps.tests.outcome == 'success' && '✅ Passed' || '⚠️ Failed - Review Required' }}
+            
+            ### Security Audit
+            See workflow logs for security audit results.
+            
+            ### Manual Testing Required
+            Before merging, please:
+            1. Review the dependency changes below
+            2. Test the demo at `demo/index.html`
+            3. Verify key features work correctly
+            4. Check browser console for errors
+            5. Test on multiple browsers if major updates included
+            
+            ### Review Checklist
+            - [ ] All CI checks passing
+            - [ ] Manual testing completed
+            - [ ] Breaking changes reviewed
+            - [ ] Documentation updated if needed
+            
+            ---
+            
+            <details>
+            <summary>Updated Packages</summary>
+            
+            ```
+            $(cat changes.txt || echo "Check diff for details")
+            ```
+            </details>
+            
+            <details>
+            <summary>Security Audit</summary>
+            
+            ```
+            $(cat audit.txt || echo "No audit information available")
+            ```
+            </details>
+            
+            ---
+            
+            **Note:** This PR was automatically created by GitHub Actions.
+            Review all changes carefully before merging.
+          labels: |
+            dependencies
+            automated
+          assignees: ${{ github.repository_owner }}
+
+      - name: Comment on failure
+        if: failure() && steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
+          body: |
+            ⚠️ **Warning:** Automated tests failed during dependency update.
+            
+            Please review the workflow logs and test locally before merging.
+
+  security-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level=moderate
+
+      - name: Check for vulnerabilities
+        run: npm audit --audit-level=high --production

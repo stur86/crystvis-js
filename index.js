@@ -4,8 +4,13 @@ import {
     CrystVis
 } from './lib/visualizer.js';
 
+import {
+    createGUIPanel
+} from './lib/gui-panel.js';
+
 export {
-    CrystVis
+    CrystVis,
+    createGUIPanel
 }
 
 export default CrystVis;

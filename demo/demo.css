@@ -18,13 +18,18 @@
     left: 0;
 }
 
-#colorgrid {
-    display: grid;
-    grid-template-rows: repeat(10, 1fr);
-    grid-template-columns: repeat(30, 1fr);
-
-    width: 300px;
-    height: 300px;
-
-    background-color: #000000;
+#error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 16px;
+    background-color: #b00020;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 9999;
+    box-sizing: border-box;
+    cursor: pointer;
 }

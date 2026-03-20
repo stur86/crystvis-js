@@ -1,5 +1,3 @@
-#version 300 es
-
 // GLSL 3.0 compliant version of the MSDF shader from three-bmfont-text
 // Taken from https://github.com/Jam3/three-bmfont-text/issues/38
 

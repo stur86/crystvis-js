@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "/home/phony_stark/miniconda2/bin/python"
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  }
 }

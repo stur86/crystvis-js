@@ -1,6 +1,6 @@
 'use strict';
 
-import chai from 'chai'
+import * as chai from 'chai';
 import chaiAlmost from 'chai-almost'
 
 import {

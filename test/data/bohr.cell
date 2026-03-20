@@ -1,0 +1,11 @@
+%block LATTICE_ABC
+bohr
+7 7 7
+90.0000 90.0000 90.0000
+%endblock LATTICE_ABC
+
+%block POSITIONS_ABS
+bohr
+H   0    0    0
+He  3.5  0    0 
+%endblock POSITIONS_ABS

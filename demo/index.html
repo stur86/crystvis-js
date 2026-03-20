@@ -16,6 +16,8 @@
             Loading...
         </div>
 
+        <div id="error-banner" style="display:none"></div>
+
         <div style="float: right; width: 30%">
             <table>
                    <caption>Input controls</caption>
@@ -41,10 +43,10 @@
                        </tr>
                        <tr>
                             <td>
-                                <input type="button" name="" value="Show unit cell" onclick="changeDisplayed({'cell': [[0,0,0]]})">
+                                <input type="button" name="" value="Show unit cell" onclick="changeDisplayed({'cell': [[0,0,0]]})"> 
                             </td>
                             <td>
-                                <input type="button" name="" value="Show 5 Ang sphere" onclick="changeDisplayed({'sphere': [[0,0,0], 5.0]})">
+                                <input type="button" name="" value="Show 5 Ang sphere" onclick="changeDisplayed({'sphere': [[0,0,0], 5.0]})"> 
                             </td>
                        </tr>
                         <tr>
@@ -52,22 +54,60 @@
                                 <input id="label-check" type="checkbox" name="" value="false" onchange="changeLabels()">Show labels
                             </td>
                             <td colspan="" rowspan="" headers="">
-                                <input id="ellipsoid-check" type="checkbox" name="" value="false" onchange="changeEllipsoids()">Show ellipsoids
+                                <input id="ellipsoid-check" type="checkbox" name="" value="false" onchange="changeEllipsoids()" disabled>Show MS ellipsoids<br>
+                                Scale: <input id="ms-scale" type="range" min="0.001" max="0.5" step="0.001" value="0.05" oninput="changeMsScale()" disabled> <span id="ms-scale-val">0.050</span>
                             </td>
                         </tr>
                         <tr>
-                          <td>
-                            <input id="isosurf-check" type="checkbox" name="" value="false" onchange="changeIsosurface()">Show isosurface
-                          </td>
-                          <td>
-                              <input type="text" id="vdw-f" size="5" value="1.0"> Van der Waals scaling
+                            <td colspan="" rowspan="" headers="">
+                                <input id="hf-ellipsoid-check" type="checkbox" name="" value="false" onchange="changeHFEllipsoids()" disabled>Show HF ellipsoids<br>
+                                Scale: <input id="hf-scale" type="range" min="0.001" max="1.0" step="0.001" value="0.1" oninput="changeHfScale()" disabled> <span id="hf-scale-val">0.100</span>
+                            </td>
+                        </tr>
+                        <tr>
+                          <td colspan="2">
+                            <input id="isosurf-check" type="checkbox" name="" value="false" onchange="changeIsosurface()" disabled>Show isosurface
                           </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <!-- message to display -- input -->
+                                <input id="message" type="text" name="" value="Hello world!">
+                            </td>
+                            <td>
+                                <!-- button to display message -->
+                                <input type="button" name="" value="Display message" onclick="displayMessage()">
+                                <!-- button to clear message -->
+                                <input type="button" name="" value="Clear messages" onclick="clearMessages()">
+
+                            </td>
+                            
+                        </tr>
+                        <tr>
+                            <td colspan="2"><hr style="margin:6px 0"><strong>Camera state</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="button" value="Save view" onclick="saveCamera()">
+                                <input type="button" value="Restore view" onclick="restoreCamera()">
+                            </td>
+                            <td>
+                                <input type="button" value="Copy JSON" onclick="copyCameraJSON()">
+                                <input type="button" value="Apply JSON" onclick="applyPastedJSON()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <textarea id="camera-json" rows="5" style="width:100%;font-family:monospace;font-size:11px;box-sizing:border-box" placeholder="Camera state will appear here…" spellcheck="false"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" id="camera-status" style="font-size:11px;color:#555"></td>
+                        </tr>
+
                    </tbody>
-           </table> 
-           <div id='colorgrid'>
-               
-           </div>
+           </table>
+           <div id="gui-mount" style="margin-top:8px"></div>
         </div>
 
     </div>

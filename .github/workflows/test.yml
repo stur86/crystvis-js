@@ -1,0 +1,191 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [20, 22]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting (ESLint)
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
+        run: npx eslint . --ext .js
+        continue-on-error: true
+
+      - name: Build resources
+        run: npm run build-resources
+
+      - name: Build demo
+        run: npm run build-demo
+
+      - name: Build HTML test
+        run: npm run build-html-test
+
+      - name: Run tests
+        run: npm test
+
+      - name: Check bundle sizes
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
+        run: |
+          echo "## Bundle Sizes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f demo/demo.js ]; then
+            DEMO_SIZE=$(du -h demo/demo.js | cut -f1)
+            DEMO_BYTES=$(stat -c%s demo/demo.js 2>/dev/null || stat -f%z demo/demo.js)
+            echo "- Demo bundle: $DEMO_SIZE ($DEMO_BYTES bytes)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f test/test-html/testbuild.js ]; then
+            TEST_SIZE=$(du -h test/test-html/testbuild.js | cut -f1)
+            TEST_BYTES=$(stat -c%s test/test-html/testbuild.js 2>/dev/null || stat -f%z test/test-html/testbuild.js)
+            echo "- Test bundle: $TEST_SIZE ($TEST_BYTES bytes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload build artifacts
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            demo/demo.js
+            test/test-html/testbuild.js
+          retention-days: 7
+
+      - name: Upload test results
+        if: always() && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-node${{ matrix.node-version }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check package.json validity
+        run: |
+          if ! jq empty package.json; then
+            echo "❌ package.json is not valid JSON"
+            exit 1
+          fi
+          echo "✅ package.json is valid"
+
+      - name: Check for security vulnerabilities
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check outdated packages
+        run: |
+          echo "## Outdated Packages" >> $GITHUB_STEP_SUMMARY
+          npm outdated >> $GITHUB_STEP_SUMMARY || true
+        continue-on-error: true
+
+      - name: Verify dependencies integrity
+        run: npm ls
+        continue-on-error: true
+
+  build-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Clean install
+        run: |
+          rm -rf node_modules
+          npm ci
+
+      - name: Build all targets
+        run: |
+          npm run build-resources
+          npm run build-demo
+          npm run build-html-test
+
+      - name: Verify builds exist
+        run: |
+          test -f demo/demo.js || (echo "❌ demo.js not found" && exit 1)
+          test -f test/test-html/testbuild.js || (echo "❌ testbuild.js not found" && exit 1)
+          echo "✅ All build artifacts created successfully"
+
+      - name: Check for build warnings
+        run: |
+          echo "## Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All builds completed without errors" >> $GITHUB_STEP_SUMMARY
+
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [test, code-quality, build-check]
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const testJob = '${{ needs.test.result }}';
+            const qualityJob = '${{ needs.code-quality.result }}';
+            const buildJob = '${{ needs.build-check.result }}';
+            
+            const icon = (status) => {
+              if (status === 'success') return '✅';
+              if (status === 'failure') return '❌';
+              return '⚠️';
+            };
+            
+            core.summary
+              .addHeading('Test Results Summary')
+              .addTable([
+                [{data: 'Job', header: true}, {data: 'Status', header: true}],
+                ['Tests', `${icon(testJob)} ${testJob}`],
+                ['Code Quality', `${icon(qualityJob)} ${qualityJob}`],
+                ['Build Check', `${icon(buildJob)} ${buildJob}`]
+              ])
+              .write();

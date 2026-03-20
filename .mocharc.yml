@@ -1,0 +1,4 @@
+require:
+  - ./test/setup-dom.cjs
+spec: test/*.js
+reporter: spec
